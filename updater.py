@@ -58,31 +58,34 @@ def find_subsequent_uuids(comic_data: Dict[str, Any], target_chapter: str) -> Li
     return [chap['uuid'] for chap in chapters[target_index + 1:]]
 
 
-def process_updates() -> Dict[str, List[str]]:
+def process_updates() -> List[Dict[str, Any]]:
     try:
         records = load_updater_json()
     except Exception as e:
         log.error(f"加载updater.json出错: {e}")
         exit(1)
 
-    result = {}
+    result = []
 
     for record in records:
         try:
-            # 调用外部API获取章节数据
             chapters = get_comic(
                 path_word=record['path_word'],
                 group_word=record['group_word']
             )
-            # 获取需要下载的UUID
             uuids = find_subsequent_uuids(chapters, record['latest_chapter'])
 
             if uuids:
-                result[record['path_word']] = uuids
+                result.append({
+                    "path_word": record['path_word'],
+                    "name": record['name'],
+                    "uuids": uuids,
+                    "group_word": record['group_word'],
+                    "current_chapter": record['latest_chapter']
+                })
 
         except Exception as e:
-            log.error(f"无法获取 {record['name']} 的相关信息: {e}")
-            exit(1)
+            log.error(f"无法处理 {record['name']}: {e}")
 
     return result
 

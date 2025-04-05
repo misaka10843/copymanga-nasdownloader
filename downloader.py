@@ -55,7 +55,7 @@ def downloader(url: str, filename: str, overwrite: bool = False) -> bool:
     return False
 
 
-def postprocess(series_name: str, chapter_name: str, chapter_number: float | int, file_path: str,
+def postprocess(series_name: str, chapter_name: str, chapter_filename: str, chapter_number: float | int, file_path: str,
                 specials: bool = False):
     source_dir = Path(file_path)
     if not source_dir.is_dir():
@@ -98,7 +98,7 @@ def postprocess(series_name: str, chapter_name: str, chapter_number: float | int
 
     # 确保目录存在
     base_dir.mkdir(parents=True, exist_ok=True)
-    cbz_path = base_dir / f"{chapter_name}.cbz"
+    cbz_path = base_dir / f"{chapter_filename}.cbz"
     cbz_path.write_bytes(comic.pack())
     log.info(f"cbz打包成功: {cbz_path}")
     os.remove(file_path)
