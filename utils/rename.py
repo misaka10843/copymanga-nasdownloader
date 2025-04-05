@@ -16,9 +16,11 @@ def rename_series(name: str, ep_pattern: Optional[str], vol_pattern: Optional[st
     """
     # 匹配自定义话数格式
     if not ep_pattern:
-        ep_pattern = r'第(\d+\.?\d*)话'
+        # 正常检测 第x话 或是 test第x话test 这种形式
+        ep_pattern = r'第\s*(\d+\.?\d*)\s*[话話]'
     if not vol_pattern:
-        vol_pattern = r'第(\d+\.?\d*)卷'
+        # 因为防止匹配到其他的卷特典啥的就直接严格按照第x卷格式进行判断
+        vol_pattern = r'(?:^|[\s\-_])(?:第?\s*(\d+\.?\d*)\s*[卷巻])(?:$|[\s\-_])'
     ep_match = re.search(ep_pattern, name)
     if ep_match:
         num_str = ep_match.group(1)
