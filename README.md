@@ -52,6 +52,8 @@ CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
 [
   {
     "name": "漫画名称(指定保存的系列名/文件夹名)",
+    "ep_pattern": "重命名的话数的正则提取，默认可以为空",
+    "vol_pattern": "重命名的卷数的正则提取，默认可以为空",
     "path_word": "copymanga的path_word",
     "group_word": "copymanga的group_word，默认为default",
     "latest_chapter": "最后下载的章节，可以用来限制下载范围(为空则直接下载所有的内容)",
@@ -59,6 +61,8 @@ CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
   },
   {
     "name": "漫画名称(指定保存的系列名/文件夹名)",
+    "ep_pattern": "重命名的话数的正则提取，默认可以为空",
+    "vol_pattern": "重命名的卷数的正则提取，默认可以为空",
     "path_word": "copymanga的path_word",
     "group_word": "copymanga的group_word，默认为default",
     "latest_chapter": "最后下载的章节，可以用来限制下载范围(为空则直接下载所有的内容)",
@@ -66,5 +70,30 @@ CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
   }
 ]
 ```
+
+实例如下
+
+````json
+[
+  {
+    "name": "白圣女与黑牧师",
+    "ep_pattern": "连载版(\\d+\\.?\\d*)",
+    "vol_pattern": "",
+    "path_word": "baishengnvyuheimushi",
+    "group_word": "default",
+    "latest_chapter": "连载版02",
+    "last_download_date": "2025-04-05T20:58:29.386183"
+  },
+  {
+    "name": "静音酱今天也睡不着觉",
+    "ep_pattern": "",
+    "vol_pattern": "",
+    "path_word": "jinyingjiangjintianyeshuibuzhaojiao",
+    "group_word": "default",
+    "latest_chapter": "",
+    "last_download_date": ""
+  }
+]
+````
 
 在配置完成之后直接运行程序即可

@@ -81,7 +81,9 @@ def process_updates() -> List[Dict[str, Any]]:
                     "name": record['name'],
                     "uuids": uuids,
                     "group_word": record['group_word'],
-                    "current_chapter": record['latest_chapter']
+                    "current_chapter": record['latest_chapter'],
+                    "ep_pattern": record['ep_pattern'],
+                    "vol_pattern": record['vol_pattern'],
                 })
 
         except Exception as e:

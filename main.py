@@ -62,8 +62,9 @@ def main():
                 log.info(f"已下载 {comic['name']} {chapter['name']} {chapter['words'][index]:04d}.jpg")
 
             log.info(f"{comic['name']} {chapter['name']} 下载完成，开始进行cbz打包")
-
-            chapter_filename, chapter_num, is_special = rename_series(chapter['name'])
+            print(comic)
+            chapter_filename, chapter_num, is_special = rename_series(chapter['name'], comic['ep_pattern'],
+                                                                      comic['vol_pattern'])
             postprocess(comic['name'], chapter['name'], chapter_filename, chapter_num, save_path, is_special)
             updater.update_chapter_record(comic['path_word'], chapter['name'])
             log.info(f"{comic['name']} {chapter['name']} cbz打包完成，等待三秒继续")
