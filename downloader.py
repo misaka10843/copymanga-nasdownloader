@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 from pathlib import Path
 
 from cbz.comic import ComicInfo
@@ -101,5 +102,5 @@ def postprocess(series_name: str, chapter_name: str, chapter_filename: str, chap
     cbz_path = base_dir / f"{chapter_filename}.cbz"
     cbz_path.write_bytes(comic.pack())
     log.info(f"cbz打包成功: {cbz_path}")
-    os.remove(file_path)
+    shutil.rmtree(file_path, ignore_errors=True)
     log.info(f"图片删除成功: {file_path}")

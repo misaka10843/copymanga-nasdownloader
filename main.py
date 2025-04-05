@@ -65,6 +65,7 @@ def main():
 
             chapter_filename, chapter_num, is_special = rename_series(chapter['name'])
             postprocess(comic['name'], chapter['name'], chapter_filename, chapter_num, save_path, is_special)
+            updater.update_chapter_record(comic['path_word'], chapter['name'])
             log.info(f"{comic['name']} {chapter['name']} cbz打包完成，等待三秒继续")
             time.sleep(3)
 

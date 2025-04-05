@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 updater.json
 temp*
+cbz
