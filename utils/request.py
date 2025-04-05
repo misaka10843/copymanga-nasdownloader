@@ -24,13 +24,14 @@ class RequestHandler:
         self.retries = retries
         self.delay = delay
         self.timeout = timeout
+        self.api = config.API_URL
         self.session = requests.Session()
 
     def request(self, method, url, **kwargs):
         for attempt in range(1, self.retries + 1):
             try:
                 self.session.headers.update(HEADERS)
-                response = self.session.request(method, url, timeout=self.timeout, **kwargs)
+                response = self.session.request(method, self.api + url, timeout=self.timeout, **kwargs)
 
                 if 200 <= response.status_code <= 302:
                     return response
