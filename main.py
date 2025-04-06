@@ -62,14 +62,19 @@ def main():
                 log.info(f"已下载 {comic['name']} {chapter['name']} {chapter['words'][index]:04d}.jpg")
 
             log.info(f"{comic['name']} {chapter['name']} 下载完成，开始进行cbz打包")
-            print(comic)
-            chapter_filename, chapter_num, is_special = rename_series(chapter['name'], comic['ep_pattern'],
-                                                                      comic['vol_pattern'])
+
+            if not config.USE_CM_CNAME:
+                chapter_filename, chapter_num, is_special = rename_series(chapter['name'], comic['ep_pattern'],
+                                                                          comic['vol_pattern'])
+            else:
+                chapter_filename, chapter_num, is_special = chapter['name'], 0, False
+
             postprocess(comic['name'], chapter['name'], chapter_filename, chapter_num, save_path, is_special)
             updater.update_chapter_record(comic['path_word'], chapter['name'])
             log.info(f"{comic['name']} {chapter['name']} cbz打包完成，等待三秒继续")
             time.sleep(3)
-
+        log.info(f"{comic['name']} 需要更新的下载已完成")
+    log.info(f"需要更新的所有漫画下载已完成")
 
 if __name__ == '__main__':
     main()
