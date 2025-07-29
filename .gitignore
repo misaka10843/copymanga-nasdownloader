@@ -175,3 +175,4 @@ cython_debug/
 temp/data/updater.json
 temp*
 cbz
+.idea/UniappTool.xml
