@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 
 def get_comic(path_word: str, group_word: str = "default") -> Any | None:
     log.info(f"开始获取漫画：{path_word}，类别：{group_word}")
-    data = request.get(f"/api/v3/comic/{path_word}/group/{group_word}/chapters?limit=500&offset=0&platform=1")
+    data = request.get(f"/api/v3/comic/{path_word}/group/{group_word}/chapters?limit=500&offset=0&platform=3&in_mainland=false")
     try:
         return data.json()['results']['list']
     except Exception as e:

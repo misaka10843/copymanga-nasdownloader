@@ -18,6 +18,8 @@
 
 建议使用青龙面板等来自定义触发时间与管理
 
+**非常非常非常不建议您每次运行时间间隔小于5天！！！！**
+
 ## 如何使用
 
 本仓库是为了nas系统下载而进行优化，所以下载器本身并没有任何的交互/配置界面
@@ -33,7 +35,7 @@
 其中各个变量的内容如下
 
 ```dotenv
-CMNAS_TOKEN= # token填写，防止有需要登录的漫画(字符串)
+CMNAS_TOKEN= # token填写，必须登录，否则会无法请求其章节详细
 CMNAS_DOWNLOAD_PATH= # 下载路径(暂存路径，将在cbz打包完成后删除)(字符串)
 CMNAS_CBZ_PATH= # CBZ存放路径(字符串)
 CMNAS_DATA_PATH= # 配置文件相关存放路径(字符串)
@@ -46,7 +48,7 @@ CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
 
 当前只能自行进行配置(之后会做一个web界面进行配置管理)
 
-请在命令运行的目录下创建`updater.json`，其中内部的结构如下：
+请在`CMNAS_DATA_PATH`的目录下创建`updater.json`，其中内部的结构如下：
 
 ```json
 [

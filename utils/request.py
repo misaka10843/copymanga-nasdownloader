@@ -1,5 +1,6 @@
 import logging
 import time
+from datetime import datetime
 
 import requests
 
@@ -8,9 +9,20 @@ from utils import config
 log = logging.getLogger(__name__)
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0",
+    "User-Agent": "COPY/2.3.2",
     "authorization": config.TOKEN,
-    "referer": "https://mangacopy.com/"
+    "referer": "com.copymanga.app-2.3.2",
+    "source": "copyApp",
+    "version": "2.3.2",
+    "region": "1",
+    "device": "V417IR",
+    "umstring": "b4c89ca4104ea9a97750314d791520ac",
+    "platform": "3",
+    "dt": datetime.now().strftime("%Y.%m.%d"),
+    "deviceinfo": "24129PN74C-24129PN74C",
+    "accept-encoding":"gzip",
+    "webp":"1",
+    "pseudoid":"KNJT34xmmyOB6A4a",
 }
 
 
