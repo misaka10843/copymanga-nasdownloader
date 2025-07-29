@@ -99,3 +99,7 @@ CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
 ````
 
 在配置完成之后直接运行程序即可
+
+## 如何开发其他站点
+
+> Todo

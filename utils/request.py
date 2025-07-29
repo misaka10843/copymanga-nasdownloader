@@ -20,9 +20,9 @@ HEADERS = {
     "platform": "3",
     "dt": datetime.now().strftime("%Y.%m.%d"),
     "deviceinfo": "24129PN74C-24129PN74C",
-    "accept-encoding":"gzip",
-    "webp":"1",
-    "pseudoid":"KNJT34xmmyOB6A4a",
+    "accept-encoding": "gzip",
+    "webp": "1",
+    "pseudoid": "KNJT34xmmyOB6A4a",
 }
 
 
@@ -57,7 +57,10 @@ class RequestHandler:
 
                 if response.status_code in (200, 201, 202):
                     return response
-
+                if response.status_code is 210:
+                    log.error(
+                        f"[{method}] 请求失败 (状态码: {response.status_code})，URL: {full_url}，信息为：{response.json().get('message')}\n 对于210只能更换代理或者等待1小时后重试，我们无能为力")
+                    exit(1)
                 log.warning(
                     f"[{method}] 请求失败 (状态码: {response.status_code})，URL: {full_url}，尝试第 {attempt}/{self.retries} 次...")
 
