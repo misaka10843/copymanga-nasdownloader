@@ -55,7 +55,8 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_index: int):
 
     log.info(f"{task['name']} {chapter['title']} 下载完成，开始进行cbz打包")
 
-    chapter_filename, chapter_num, is_special = chapter['title'], task['starting_index'] + chapter_index + 1, False
+    chapter_filename, chapter_num, is_special = (f"{chapter_index + 1:04d} {chapter['title']}",
+                                                 task['starting_index'] + chapter_index + 1, False)
 
     postprocess(
         task['name'], chapter['title'],
