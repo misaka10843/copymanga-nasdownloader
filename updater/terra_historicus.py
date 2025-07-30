@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Any, Generator
+from typing import Dict, List, Any
 
 from utils.request import RequestHandler
 from .base import BaseUpdater
@@ -35,8 +35,8 @@ class TerraHistoricusUpdater(BaseUpdater):
             for idx, chapter in enumerate(data['data']['episodes']):
                 chapter['index'] = idx  # 添加章节序号用于排序
                 chapters.append(chapter)
-            log.debug(f"章节ID: {chapters}")
-            return chapters
+            log.debug(f"章节ID: {chapters[::-1]}")
+            return chapters[::-1]
 
         except Exception as e:
             log.exception(f"获取章节异常: {str(e)}")
@@ -47,19 +47,17 @@ class TerraHistoricusUpdater(BaseUpdater):
         if not chapters:
             return []
 
-        sorted_chapters = sorted(chapters, key=lambda x: x['index'])
-
         if not target_chapter:
-            return [chap['cid'] for chap in sorted_chapters]
+            return [chap['cid'] for chap in chapters]
 
         target_index = -1
-        for i, chapter in enumerate(sorted_chapters):
+        for i, chapter in enumerate(chapters):
             if chapter['title'] == target_chapter or chapter['shortTitle'] == target_chapter:
                 target_index = i
                 break
 
-        if target_index != -1 and target_index < len(sorted_chapters) - 1:
-            return [chap['cid'] for chap in sorted_chapters[target_index + 1:]]
+        if target_index != -1 and target_index < len(chapters) - 1:
+            return [chap['cid'] for chap in chapters[target_index + 1:]]
 
         return []
 

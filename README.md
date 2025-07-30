@@ -25,7 +25,6 @@
 - [x] copymanga
 - [x] 泰拉记事社
 
-
 ## 如何使用
 
 本仓库是为了nas系统下载而进行优化，所以下载器本身并没有任何的交互/配置界面
@@ -62,7 +61,9 @@ CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
 
 ```json
 [
-"copymanga":[
+  "copymanga"
+  :
+  [
     {
       "name": "漫画名称(指定保存的系列名/文件夹名)",
       "ep_pattern": "重命名的话数的正则提取，默认可以为空",
@@ -114,7 +115,8 @@ CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
 
 #### 泰拉记事社
 
-对于漫画ID获取可以直接前往官网点击任何一个漫画例如 `https://terra-historicus.hypergryph.com/comic/6253` 中的 `6253` 就是漫画ID
+对于漫画ID获取可以直接前往官网点击任何一个漫画例如 `https://terra-historicus.hypergryph.com/comic/6253` 中的 `6253`
+就是漫画ID
 
 配置结构如下
 
@@ -181,5 +183,5 @@ CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
 并在`updater`文件夹中也创建对应站点的脚本
 
 > Todo 此处还需补充开发相关信息
-> 
+>
 > 在完成之前可以参考泰拉记事社的相关模块
