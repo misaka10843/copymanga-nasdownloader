@@ -9,7 +9,9 @@ from cbz.page import PageInfo
 from natsort import natsorted
 
 from utils import config
-from utils.request import get
+from utils.request import RequestHandler
+
+request = RequestHandler()
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +27,7 @@ def downloader(url: str, filename: str, overwrite: bool = False) -> bool:
 
     try:
         # 发起HTTP请求
-        response = get(url)
+        response = request.get(url)
 
         if response is None:
             log.error(f"无法获取图片响应，URL: {url}")

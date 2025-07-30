@@ -1,10 +1,13 @@
 import logging
 from typing import Dict, List, Any
 
-from utils import request
+from plugins.copymanga.headers import HEADERS
+from utils.request import RequestHandler
 from .base import BaseUpdater
 
 log = logging.getLogger(__name__)
+
+request = RequestHandler(headers=HEADERS)
 
 
 class CopyMangaUpdater(BaseUpdater):
@@ -22,17 +25,17 @@ class CopyMangaUpdater(BaseUpdater):
 
     def find_subsequent_uuids(self, chapters: List[Dict], target_chapter: str) -> List[str]:
         sorted_chapters = sorted(chapters, key=lambda x: x['index'])
+        if target_chapter:
+            target_index = -1
+            for i, chapter in enumerate(sorted_chapters):
+                if chapter['name'] == target_chapter:
+                    target_index = i
+                    break
 
-        target_index = -1
-        for i, chapter in enumerate(sorted_chapters):
-            if chapter['name'] == target_chapter:
-                target_index = i
-                break
-
-        if target_index == -1 or target_index == len(sorted_chapters) - 1:
-            return []
-
-        return [chap['uuid'] for chap in sorted_chapters[target_index + 1:]]
+            if target_index == -1 or target_index == len(sorted_chapters) - 1:
+                return []
+            return [chap['uuid'] for chap in sorted_chapters[target_index + 1:]]
+        return [chap['uuid'] for chap in sorted_chapters]
 
     def create_download_task(self, record: Dict, uuids: List[str]) -> Dict[str, Any]:
         return {

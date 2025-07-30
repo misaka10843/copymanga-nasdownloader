@@ -4,11 +4,15 @@ import time
 from typing import List, Dict, Any
 
 from downloader import downloader, postprocess
+from plugins.copymanga.headers import HEADERS
 from updater import updater
-from utils import config, request
+from utils import config
 from utils.rename import rename_series
+from utils.request import RequestHandler
 
 log = logging.getLogger(__name__)
+
+request = RequestHandler(headers=HEADERS)
 
 
 def get_chapter(path_word: str, uuid: str):

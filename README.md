@@ -23,7 +23,7 @@
 ## 当前支持站点
 
 - [x] copymanga
-- [ ] 泰拉记事社 [在建]
+- [x] 泰拉记事社
 
 
 ## 如何使用
@@ -54,7 +54,11 @@ CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
 
 当前只能自行进行配置(之后会做一个web界面进行配置管理)
 
-请在`CMNAS_DATA_PATH`的目录下创建`updater.json`，其中内部的结构如下：
+请在`CMNAS_DATA_PATH`的目录下创建`updater.json`
+
+#### copymanga
+
+其中内部的结构如下：
 
 ```json
 [
@@ -81,11 +85,11 @@ CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
 ]
 ```
 
-实例如下
+示例如下
 
 ````json
-[
-  "copymanga":[
+{
+  "copymanga": [
     {
       "name": "白圣女与黑牧师",
       "ep_pattern": "连载版(\\d+\\.?\\d*)",
@@ -105,11 +109,77 @@ CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
       "last_download_date": ""
     }
   ]
-]
+}
 ````
+
+#### 泰拉记事社
+
+对于漫画ID获取可以直接前往官网点击任何一个漫画例如 `https://terra-historicus.hypergryph.com/comic/6253` 中的 `6253` 就是漫画ID
+
+配置结构如下
+
+```json
+{
+  "terra_historicus": [
+    {
+      "name": "漫画名称",
+      "comic_id": 漫画id(数字),
+      "latest_chapter": "最后下载的章节，可以用来限制下载范围(为空则直接下载所有的内容)",
+      "last_download_date": "最后下载章节的完成日期"
+    }
+  ]
+}
+```
+
+示例如下
+
+```json
+{
+  "terra_historicus": [
+    {
+      "name": "暮岁闲谈：这是平凡人生",
+      "comic_id": 4579,
+      "last_download_date": "2025-07-30T15:17:12.854869",
+      "latest_chapter": "这是平凡人生"
+    }
+  ]
+}
+```
+
+如果需要下载两个及以上的站点可以通过下方结构配置
+
+```json
+{
+  "copymanga": [
+    {
+      "name": "白圣女与黑牧师",
+      "ep_pattern": "连载版(\\d+\\.?\\d*)",
+      "vol_pattern": "",
+      "path_word": "baishengnvyuheimushi",
+      "group_word": "default",
+      "latest_chapter": "连载版02",
+      "last_download_date": "2025-04-05T20:58:29.386183"
+    }
+  ],
+  "terra_historicus": [
+    {
+      "name": "暮岁闲谈：这是平凡人生",
+      "comic_id": 4579,
+      "last_download_date": "2025-07-30T15:17:12.854869",
+      "latest_chapter": "这是平凡人生"
+    }
+  ]
+}
+```
 
 在配置完成之后直接运行程序即可
 
 ## 如何开发其他站点
 
-> Todo
+在开发其他站点时，请在`plugins`文件夹中创建对应站点的包
+
+并在`updater`文件夹中也创建对应站点的脚本
+
+> Todo 此处还需补充开发相关信息
+> 
+> 在完成之前可以参考泰拉记事社的相关模块

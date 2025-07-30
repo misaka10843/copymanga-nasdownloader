@@ -1,6 +1,5 @@
 import logging
 import time
-from datetime import datetime
 
 import requests
 
@@ -9,30 +8,21 @@ from utils import config
 log = logging.getLogger(__name__)
 
 HEADERS = {
-    "User-Agent": "COPY/2.3.2",
-    "authorization": config.TOKEN,
-    "referer": "com.copymanga.app-2.3.2",
-    "source": "copyApp",
-    "version": "2.3.2",
-    "region": "1",
-    "device": "V417IR",
-    "umstring": "b4c89ca4104ea9a97750314d791520ac",
-    "platform": "3",
-    "dt": datetime.now().strftime("%Y.%m.%d"),
-    "deviceinfo": "24129PN74C-24129PN74C",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0",
     "accept-encoding": "gzip",
-    "webp": "1",
-    "pseudoid": "KNJT34xmmyOB6A4a",
 }
 
 
 class RequestHandler:
-    def __init__(self, retries=3, delay=3, timeout=10):
+    def __init__(self, retries=3, delay=3, timeout=10, headers=None):
         """
         :param retries: 最大重试次数
         :param delay: 每次重试的间隔时间（秒）
         :param timeout: 请求超时时间（秒）
         """
+        self.headers = headers
+        if headers is None:
+            self.headers = HEADERS
         self.retries = retries
         self.delay = delay
         self.timeout = timeout
@@ -52,12 +42,12 @@ class RequestHandler:
 
         for attempt in range(1, self.retries + 1):
             try:
-                self.session.headers.update(HEADERS)
+                self.session.headers.update(self.headers)
                 response = self.session.request(method, full_url, timeout=self.timeout, **kwargs)
 
                 if response.status_code in (200, 201, 202):
                     return response
-                if response.status_code is 210:
+                if response.status_code == 210:
                     log.error(
                         f"[{method}] 请求失败 (状态码: {response.status_code})，URL: {full_url}，信息为：{response.json().get('message')}\n 对于210只能更换代理或者等待1小时后重试，我们无能为力")
                     exit(1)
@@ -77,9 +67,3 @@ class RequestHandler:
 
     def post(self, url, **kwargs):
         return self.request("POST", url, **kwargs)
-
-
-_default_client = RequestHandler()
-
-get = _default_client.get
-post = _default_client.post
