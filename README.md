@@ -60,10 +60,8 @@ CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
 其中内部的结构如下：
 
 ```json
-[
-  "copymanga"
-  :
-  [
+{
+  "copymanga":[
     {
       "name": "漫画名称(指定保存的系列名/文件夹名)",
       "ep_pattern": "重命名的话数的正则提取，默认可以为空",
@@ -83,7 +81,7 @@ CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
       "last_download_date": "最后下载章节的完成日期"
     }
   ]
-]
+}
 ```
 
 示例如下
