@@ -69,10 +69,9 @@ class TerraHistoricusUpdater(BaseUpdater):
             # 查找最新章节的索引
             chapters = self.get_chapters(record)
             for chapter in chapters:
+                starting_index += 1
                 if chapter['title'] == record['latest_chapter'] or chapter['shortTitle'] == record['latest_chapter']:
-                    starting_index = chapter['index']
                     break
-
         return {
             "site": self.SITE_NAME,
             "comic_id": record['comic_id'],
