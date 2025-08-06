@@ -12,7 +12,7 @@ from utils.request import RequestHandler
 
 log = logging.getLogger(__name__)
 
-request = RequestHandler(headers=HEADERS)
+request = RequestHandler(headers=HEADERS, proxy=config.CM_PROXY)
 
 
 def get_chapter(path_word: str, uuid: str):

@@ -47,6 +47,9 @@ CMNAS_DATA_PATH= # 配置文件相关存放路径(字符串)
 CMNAS_USE_CM_CNAME= # 是否使用copymanga的章节名，如果不使用将按照kavita的格式进行命名(True/False)
 CMNAS_API_URL= # API服务器地址(字符串)
 CMNAS_LOG_LEVEL= # 日志等级(DEBUG,INFO,WARNING,ERROR)
+CMNAS_CM_USERNAME= # copymanga 账户名称
+CMNAS_CM_PASSWORD= # copymanga 密码
+CMNAS_CM_PROXY= # copymanga 使用的代理
 ```
 
 ### 配置更新列表

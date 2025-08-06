@@ -4,7 +4,7 @@ from utils import config
 
 HEADERS = {
     "User-Agent": "COPY/2.3.2",
-    "authorization": config.TOKEN,
+    "authorization": config.CM_TOKEN,
     "referer": "com.copymanga.app-2.3.2",
     "source": "copyApp",
     "version": "2.3.2",

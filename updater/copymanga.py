@@ -2,12 +2,14 @@ import logging
 from typing import Dict, List, Any
 
 from plugins.copymanga.headers import HEADERS
+from plugins.copymanga.login import loginhelper
+from utils import config
 from utils.request import RequestHandler
 from .base import BaseUpdater
 
 log = logging.getLogger(__name__)
 
-request = RequestHandler(headers=HEADERS)
+request = RequestHandler(headers=HEADERS, proxy=config.CM_PROXY)
 
 
 class CopyMangaUpdater(BaseUpdater):
@@ -16,6 +18,11 @@ class CopyMangaUpdater(BaseUpdater):
     REQUIRED_FIELDS = BaseUpdater.REQUIRED_FIELDS + [
         'name', 'path_word', 'group_word', 'ep_pattern', 'vol_pattern'
     ]
+    if config.CM_USERNAME and config.CM_PASSWORD:
+        logging.info("获取到copymanga用户名和密码，将尝试登录而不是使用配置的Token")
+        HEADERS['authorization'] = loginhelper(username=config.CM_USERNAME, password=config.CM_PASSWORD,
+                                               url=config.CM_API_URL)
+        logging.debug(HEADERS)
 
     def get_chapters(self, record: Dict) -> List[Dict]:
         log.info(f"获取漫画：{record['path_word']}，类别：{record['group_word']}")

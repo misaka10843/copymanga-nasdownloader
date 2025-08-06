@@ -14,19 +14,23 @@ HEADERS = {
 
 
 class RequestHandler:
-    def __init__(self, retries=3, delay=3, timeout=10, headers=None):
+    def __init__(self, retries=3, delay=3, timeout=10, proxy=None, headers=None):
         """
         :param retries: 最大重试次数
         :param delay: 每次重试的间隔时间（秒）
         :param timeout: 请求超时时间（秒）
         """
+        if proxy is None:
+            proxy = {}
+        self.proxy = proxy
         self.headers = headers
+        self.retries = retries
         if headers is None:
             self.headers = HEADERS
         self.retries = retries
         self.delay = delay
         self.timeout = timeout
-        self.api = config.API_URL.rstrip('/')  # 确保API地址没有结尾斜杠
+        self.api = config.CM_API_URL.rstrip('/')  # 确保API地址没有结尾斜杠
         self.session = requests.Session()
 
     def _build_url(self, url: str) -> str:
@@ -43,7 +47,7 @@ class RequestHandler:
         for attempt in range(1, self.retries + 1):
             try:
                 self.session.headers.update(self.headers)
-                response = self.session.request(method, full_url, timeout=self.timeout, **kwargs)
+                response = self.session.request(method, full_url, timeout=self.timeout, proxies=self.proxy, **kwargs)
 
                 if response.status_code in (200, 201, 202):
                     return response
