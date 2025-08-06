@@ -32,6 +32,7 @@ jobs:
 
       - name: Build Executable (Nuitka onefile)
         run: |
+          pip install nuitka
           OUTPUT_NAME="copymanga-nasdownloader${{ matrix.os == 'ubuntu-latest' && '-linux' || '' }}${{ matrix.os == 'windows-latest' && '.exe' || '' }}"
           python -m nuitka \
             --onefile \
