@@ -39,7 +39,7 @@ def download_chapter(task: Dict[str, Any], uuid: str):
     # 下载所有图片
     for index, url in enumerate(chapter['contents']):
         image_path = os.path.join(save_path, f"{chapter['words'][index]:04d}.jpg")
-        full_url = url['url'].replace("c800x.jpg", "c1500x.jpg")
+        full_url = url['url'].replace("c800x.jpg", "c1500x.jpg").replace("c800x.webp", "c1500x.webp")
 
         if downloader(full_url, image_path):
             log.info(f"已下载 {task['name']} {chapter['name']} {chapter['words'][index]:04d}.jpg")
