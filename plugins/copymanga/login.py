@@ -1,3 +1,5 @@
+import logging
+
 import requests
 
 from utils import config
@@ -12,7 +14,7 @@ def login(**information: dict) -> str:
     """
     if information["username"]:
         try:
-            res = requests.post(f"https://{information['url']}/api/kb/web/login", data={
+            res = requests.post(f"{information['url']}/api/kb/web/login", data={
                 "username": information["username"],
                 "password": information["password"],
                 "salt": information["salt"]
@@ -47,6 +49,7 @@ def loginhelper(username: str, password: str, url: str) -> str:
     password_enc = b64encode(password_enc.encode()).decode()
     # 登录
     res = login(**{"username": username, "password": password_enc, "url": url, "salt": salt, "proxy": config.CM_PROXY})
+    logging.debug(res)
     return res
 
 

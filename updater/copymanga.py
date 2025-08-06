@@ -18,11 +18,6 @@ class CopyMangaUpdater(BaseUpdater):
     REQUIRED_FIELDS = BaseUpdater.REQUIRED_FIELDS + [
         'name', 'path_word', 'group_word', 'ep_pattern', 'vol_pattern'
     ]
-    if config.CM_USERNAME and config.CM_PASSWORD:
-        logging.info("获取到copymanga用户名和密码，将尝试登录而不是使用配置的Token")
-        HEADERS['authorization'] = loginhelper(username=config.CM_USERNAME, password=config.CM_PASSWORD,
-                                               url=config.CM_API_URL)
-        logging.debug(HEADERS)
 
     def get_chapters(self, record: Dict) -> List[Dict]:
         log.info(f"获取漫画：{record['path_word']}，类别：{record['group_word']}")
@@ -45,6 +40,11 @@ class CopyMangaUpdater(BaseUpdater):
         return [chap['uuid'] for chap in sorted_chapters]
 
     def create_download_task(self, record: Dict, uuids: List[str]) -> Dict[str, Any]:
+        if config.CM_USERNAME and config.CM_PASSWORD:
+            logging.info("获取到copymanga用户名和密码，将尝试登录而不是使用配置的Token")
+            HEADERS['authorization'] = (f"Bearer "
+                                        f"{loginhelper(username=config.CM_USERNAME, password=config.CM_PASSWORD, url=config.CM_API_URL)}")
+            logging.debug(HEADERS)
         return {
             "site": self.SITE_NAME,
             "path_word": record['path_word'],
