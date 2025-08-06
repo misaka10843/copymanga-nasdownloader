@@ -1,26 +1,16 @@
-name: Linux&Windows build
+name: Linux & Windows build
 
 on:
   release:
     types:
       - released
-  push:
-    branches:
-      - master
-    paths-ignore:
-      - '*.md'
-      - '*.json'
-      - '*.txt'
-      - '.github/workflows/*.yaml'
-      - 'setup.py'
-      - 'pyproject.toml'
   workflow_dispatch:
+
 jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
-
+        os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -30,8 +20,8 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # Version range or exact version of a Python version to use, using SemVer's version range syntax
-          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+          python-version: '3.10'
+          architecture: 'x64'
           cache: 'pip'
           cache-dependency-path: |
             **/requirements*.txt
@@ -40,35 +30,35 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Build Executable
-        uses: Nuitka/Nuitka-Action@main
-        with:
-          nuitka-version: main
-          script-name: main.py
-          mode: app
+      - name: Build Executable (Nuitka onefile)
+        run: |
+          OUTPUT_NAME="copymanga-nasdownloader${{ matrix.os == 'ubuntu-latest' && '-linux' || '' }}${{ matrix.os == 'windows-latest' && '.exe' || '' }}"
+          python -m nuitka \
+            --onefile \
+            --output-filename="$OUTPUT_NAME" \
+            main.py
+          mkdir -p build
+          mv "$OUTPUT_NAME" build/
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ runner.os }} Build
-          path: |
-            build/*.exe
-            build/*.bin
-            build/*.app/**/*
-          include-hidden-files: true
+          name: ${{ matrix.os }} Build
+          path: build/*
 
       - name: Prepare GH Release Assets
-          if: github.event_name == 'release'
-          run: |-
-            for file in ./build/*; do
-            md5sum ${file#./} >> ${file%.*}.md5
-            sha256sum ${file#./} >> ${file%.*}.sha256
-            done
-            ls -l
+        if: github.event_name == 'release'
+        run: |-
+          cd build
+          for file in *; do
+            md5sum "$file" >> "${file%.*}.md5"
+            sha256sum "$file" >> "${file%.*}.sha256"
+          done
+          ls -l
 
       - name: Upload GH Release Assets
         if: github.event_name == 'release'
-        uses: shogo82148/actions-upload-release-asset@aac270e08f6b4547ada0b3800f88e1eb3ce9d400 # v1.7.7
+        uses: shogo82148/actions-upload-release-asset@aac270e08f6b4547ada0b3800f88e1eb3ce9d400
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./build/*
+          asset_path: build/*
