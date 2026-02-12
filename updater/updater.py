@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, List, Any
 
 from utils import config
-from . import copymanga, terra_historicus
+from . import copymanga, terra_historicus, antbyw
 
 log = logging.getLogger(__name__)
 
@@ -12,6 +12,7 @@ log = logging.getLogger(__name__)
 SITE_MAPPING = {
     "copymanga": copymanga.CopyMangaUpdater,
     "terra_historicus": terra_historicus.TerraHistoricusUpdater,
+    "antbyw": antbyw.AntbywUpdater,
 }
 
 

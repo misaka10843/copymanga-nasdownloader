@@ -9,6 +9,7 @@ class DownloadDispatcher:
     SITE_MODULES = {
         "copymanga": "plugins.copymanga.main",
         "terra_historicus":"plugins.terra_historicus.main",
+        "antbyw":"plugins.antbyw.main",
     }
 
     @classmethod

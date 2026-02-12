@@ -20,10 +20,13 @@
 
 **非常非常非常不建议您每次运行时间间隔小于5天！！！！**
 
+您需要注意的一点，为了尽可能不影响到相关站点，此程序并不会也永不会支持多线程处理，请多多支持对应站点，小站真的不容易
+
 ## 当前支持站点
 
-- [x] copymanga
-- [x] 泰拉记事社
+- [x] [copymanga](https://copymanga.com)
+- [x] [泰拉记事社](https://terra-historicus.hypergryph.com)
+- [x] [antbyw](https://www.antbyw.com)
 
 ## 如何使用
 
@@ -144,6 +147,43 @@ CMNAS_CM_PROXY= # copymanga 使用的代理
       "comic_id": 4579,
       "last_download_date": "2025-07-30T15:17:12.854869",
       "latest_chapter": "这是平凡人生"
+    }
+  ]
+}
+```
+
+#### antbyw
+
+对于漫画ID获取可以直接前往官网点击任何一个漫画例如 `https://www.antbyw.com/plugin.php?id=jameson_manhua&a=read&kuid=196880` 中的 `196880`（kuid的值）
+就是漫画ID
+
+配置结构如下
+
+```json
+{
+  "antbyw": [
+    {
+      "comic_id": "漫画ID",
+      "name": "漫画名称",
+      "group_word": "单话/单行本/番外篇",
+      "last_download_date": "",
+      "latest_chapter": ""
+    }
+  ]
+}
+```
+
+示例如下
+
+```json
+{
+  "antbyw": [
+    {
+      "comic_id": "196880",
+      "name": "放学后的迷宫冒险者们",
+      "group_word": "单话",
+      "last_download_date": "",
+      "latest_chapter": ""
     }
   ]
 }
