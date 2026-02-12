@@ -25,15 +25,17 @@ def get_chapter(path_word: str, uuid: str):
         return None
 
 
-def download_chapter(task: Dict[str, Any], uuid: str):
+def download_chapter(task: Dict[str, Any], uuid: str, chapter_name: str):
     """下载单个章节"""
     chapter = get_chapter(task['path_word'], uuid)
     if not chapter:
-        log.error(f"无法获取章节 {uuid} 的内容")
+        log.error(f"无法获取章节 {chapter_name} (UUID: {uuid}) 的内容")
         return False
 
-    log.info(f"已获取到{task['name']} {chapter['name']}的内容，开始安排下载")
-    save_path = os.path.join(config.DOWNLOAD_PATH, task['name'], chapter['name'])
+    current_name = chapter_name
+    log.info(f"已获取到 {task['name']} {current_name} 的内容，开始安排下载")
+
+    save_path = os.path.join(config.DOWNLOAD_PATH, task['name'], current_name)
     os.makedirs(save_path, exist_ok=True)
 
     # 下载所有图片
@@ -42,45 +44,45 @@ def download_chapter(task: Dict[str, Any], uuid: str):
         full_url = url['url'].replace("c800x.jpg", "c1500x.jpg").replace("c800x.webp", "c1500x.webp")
 
         if downloader(full_url, image_path):
-            log.info(f"已下载 {task['name']} {chapter['name']} {chapter['words'][index]:04d}.jpg")
+            log.info(f"已下载 {task['name']} {current_name} {chapter['words'][index]:04d}.jpg")
         else:
-            log.error(f"下载失败: {task['name']} {chapter['name']} {chapter['words'][index]:04d}.jpg")
+            log.error(f"下载失败: {task['name']} {current_name} {chapter['words'][index]:04d}.jpg")
 
-    log.info(f"{task['name']} {chapter['name']} 下载完成，开始进行cbz打包")
+    log.info(f"{task['name']} {current_name} 下载完成，开始进行cbz打包")
 
     # 文件重命名处理
     if not config.USE_CM_CNAME:
         chapter_filename, chapter_num, is_special = rename_series(
-            chapter['name'], task['ep_pattern'], task['vol_pattern'])
+            current_name, task['ep_pattern'], task['vol_pattern'])
     else:
-        chapter_filename, chapter_num, is_special = chapter['name'], 0, False
+        chapter_filename, chapter_num, is_special = current_name, 0, False
 
     postprocess(
-        task['name'], chapter['name'],
+        task['name'], current_name,
         chapter_filename, chapter_num, save_path, is_special
     )
 
     # 更新下载记录
     updater.update_chapter_record(
-        task['site'], task['path_word'], chapter['name']
+        task['site'], task['path_word'], current_name
     )
 
-    log.info(f"{task['name']} {chapter['name']} cbz打包完成")
+    log.info(f"{task['name']} {current_name} cbz打包完成")
     return True
 
 
 def download_task(task: Dict[str, Any]):
     """处理单个漫画任务的所有章节下载"""
-    if not task['uuids']:
+    if not task.get('chapter_infos'):
         log.info(f"{task['name']} 没有待下载章节")
         return
 
-    log.info(f"开始处理 {task['name']} 的 {len(task['uuids'])} 个章节")
+    log.info(f"开始处理 {task['name']} 的 {len(task['chapter_infos'])} 个章节")
 
-    for uuid in task['uuids']:
-        success = download_chapter(task, uuid)
+    for uuid, name in task['chapter_infos']:
+        success = download_chapter(task, uuid, name)
         if not success:
-            log.error(f"章节下载失败: {task['name']}, UUID: {uuid}")
+            log.error(f"章节下载失败: {task['name']} {name}, UUID: {uuid}")
         time.sleep(3)
 
     log.info(f"{task['name']} 需要更新的下载已完成")
@@ -95,18 +97,20 @@ def download_batch(tasks: List[Dict[str, Any]]):
     log.info(f"检测到 {len(tasks)} 个漫画有更新内容")
 
     for task in tasks:
+        debug_uuids = "\n".join([f"  - {uuid} ({name})" for uuid, name in task.get('chapter_infos', [])])
+
         debug = (
-                f"漫画名称: {task['name']}\n"
-                f"路径标识: {task['path_word']}\n"
-                f"当前章节: {task['current_chapter']}\n"
-                f"待更新数: {len(task['uuids'])}\n"
-                f"UUID列表:\n" + "\n".join([f"  - {uuid}" for uuid in task['uuids']])
+            f"漫画名称: {task['name']}\n"
+            f"路径标识: {task['path_word']}\n"
+            f"当前章节: {task['current_chapter']}\n"
+            f"待更新数: {len(task.get('chapter_infos', []))}\n"
+            f"UUID列表:\n{debug_uuids}"
         )
         # 打印任务信息
         info = (
             f"漫画名称: {task['name']}\n"
             f"当前章节: {task['current_chapter'] or '无'}\n"
-            f"待更新数: {len(task['uuids'])}"
+            f"待更新数: {len(task.get('chapter_infos', []))}"
         )
         log.info(info)
         log.debug(debug)

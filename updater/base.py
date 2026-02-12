@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Tuple
 
 log = logging.getLogger(__name__)
 
@@ -27,11 +27,11 @@ class BaseUpdater:
         """获取漫画章节列表"""
         raise NotImplementedError
 
-    def find_subsequent_uuids(self, chapters: List[Dict], target_chapter: str) -> List[str]:
-        """查找后续章节UUID """
+    def find_subsequent_uuids(self, chapters: List[Dict], target_chapter: str) -> List[Tuple[str, str]]:
+        """查找后续章节UUID和名称 (uuid, name)"""
         raise NotImplementedError
 
-    def create_download_task(self, record: Dict, uuids: List[str]) -> Dict[str, Any]:
+    def create_download_task(self, record: Dict, chapter_infos: List[Tuple[str, str]]) -> Dict[str, Any]:
         """创建下载任务"""
         raise NotImplementedError
 

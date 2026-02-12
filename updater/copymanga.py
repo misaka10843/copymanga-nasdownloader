@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Tuple
 
 from plugins.copymanga.headers import HEADERS
 from plugins.copymanga.login import loginhelper
@@ -32,7 +32,7 @@ class CopyMangaUpdater(BaseUpdater):
         data = request.get(url)
         return data.json()['results']['list']
 
-    def find_subsequent_uuids(self, chapters: List[Dict], target_chapter: str) -> List[str]:
+    def find_subsequent_uuids(self, chapters: List[Dict], target_chapter: str) -> List[Tuple[str, str]]:
         sorted_chapters = sorted(chapters, key=lambda x: x['index'])
         if target_chapter:
             target_index = -1
@@ -43,15 +43,16 @@ class CopyMangaUpdater(BaseUpdater):
 
             if target_index == -1 or target_index == len(sorted_chapters) - 1:
                 return []
-            return [chap['uuid'] for chap in sorted_chapters[target_index + 1:]]
-        return [chap['uuid'] for chap in sorted_chapters]
+            return [(chap['uuid'], chap['name']) for chap in sorted_chapters[target_index + 1:]]
 
-    def create_download_task(self, record: Dict, uuids: List[str]) -> Dict[str, Any]:
+        return [(chap['uuid'], chap['name']) for chap in sorted_chapters]
+
+    def create_download_task(self, record: Dict, chapter_infos: List[Tuple[str, str]]) -> Dict[str, Any]:
         return {
             "site": self.SITE_NAME,
             "path_word": record['path_word'],
             "name": record['name'],
-            "uuids": uuids,
+            "chapter_infos": chapter_infos,
             "group_word": record['group_word'],
             "current_chapter": record['latest_chapter'],
             "ep_pattern": record['ep_pattern'],

@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Tuple
 
 from utils.request import RequestHandler
 from .base import BaseUpdater
@@ -42,13 +42,13 @@ class TerraHistoricusUpdater(BaseUpdater):
             log.exception(f"获取章节异常: {str(e)}")
             return []
 
-    def find_subsequent_uuids(self, chapters: List[Dict], target_chapter: str) -> List[str]:
-        """查找目标章节后的所有章节ID"""
+    def find_subsequent_uuids(self, chapters: List[Dict], target_chapter: str) -> List[Tuple[str, str]]:
+        """查找目标章节后的所有章节ID和标题"""
         if not chapters:
             return []
 
         if not target_chapter:
-            return [chap['cid'] for chap in chapters]
+            return [(chap['cid'], chap['title']) for chap in chapters]
 
         target_index = -1
         for i, chapter in enumerate(chapters):
@@ -57,16 +57,15 @@ class TerraHistoricusUpdater(BaseUpdater):
                 break
 
         if target_index != -1 and target_index < len(chapters) - 1:
-            return [chap['cid'] for chap in chapters[target_index + 1:]]
+            return [(chap['cid'], chap['title']) for chap in chapters[target_index + 1:]]
 
         return []
 
-    def create_download_task(self, record: Dict, uuids: List[str]) -> Dict[str, Any]:
+    def create_download_task(self, record: Dict, chapter_infos: List[Tuple[str, str]]) -> Dict[str, Any]:
         """创建下载任务数据结构"""
         # 计算起始索引
         starting_index = 0
         if record.get('latest_chapter'):
-            # 查找最新章节的索引
             chapters = self.get_chapters(record)
             for chapter in chapters:
                 starting_index += 1
@@ -76,7 +75,7 @@ class TerraHistoricusUpdater(BaseUpdater):
             "site": self.SITE_NAME,
             "comic_id": record['comic_id'],
             "name": record['name'],
-            "cids": uuids,
+            "chapter_infos": chapter_infos,
             "latest_chapter": record.get('latest_chapter', ""),
             "starting_index": starting_index
         }
