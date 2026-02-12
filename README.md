@@ -179,10 +179,38 @@ CMNAS_CM_PROXY= # copymanga 使用的代理
 
 ## 如何开发其他站点
 
-在开发其他站点时，请在`plugins`文件夹中创建对应站点的包
+`copymanga-nasdownloader` 采用模块化设计，增加新站点支持需要遵循以下步骤。
 
-并在`updater`文件夹中也创建对应站点的脚本
+(如果不会可以看当前已有的站点)
 
-> Todo 此处还需补充开发相关信息
->
-> 在完成之前可以参考泰拉记事社的相关模块
+### 核心流程
+
+1. **定义 Updater**: 在 `updater/` 目录下创建站点更新器，负责获取章节列表和对比本地记录。
+2. **定义 Plugin**: 在 `plugins/` 目录下创建站点插件，负责解析具体章节的图片 URL 并下载。
+3. **注册站点**: 在 `updater/updater.py` 和 `dispatcher.py` 中注册新站点的映射关系。
+
+### 开发步骤
+
+#### 第一步：创建更新器 (Updater)
+
+在 `updater/your_site.py` 中继承 `BaseUpdater`：
+
+* `get_chapters()`: 调用 API 或爬取网页，返回包含章节名称和 ID 的列表。
+* `find_subsequent_uuids()`: 根据 `updater.json` 中的 `latest_chapter` 过滤出需要下载的新章节 ID。
+* `create_download_task()`: 构造传递给插件的任务字典。
+
+#### 第二步：创建下载插件 (Plugin)
+
+在 `plugins/your_site/main.py` 中实现：
+
+* `download_batch(tasks)`: 插件的入口点。
+* `download_chapter()`: 处理单章逻辑。
+* 调用 `downloader.downloader` 下载图片。
+* 下载完成后调用 `downloader.postprocess` 进行 CBZ 打包。
+
+#### 第三步：配置与注册
+
+1. **环境变量**: 如需特殊配置（如 Cookie/Token），在 `utils/config.py` 和 `.env.sample` 中添加。
+2. **映射注册**:
+* `updater/updater.py` -> `SITE_MAPPING`
+* `dispatcher.py` -> `SITE_MODULES`
