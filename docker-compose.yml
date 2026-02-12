@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  cmnas:
+    build: .
+    image: copymanga-nasdownloader:latest
+    container_name: cmnas
+    restart: unless-stopped
+    ports:
+      - "8000:8000"  # Web 访问端口
+    volumes:
+      # 映射数据目录 (配置文件、日志)
+      - ./data:/data
+      # 映射下载目录 (临时下载文件)
+      - ./downloads:/downloads
+      # 映射 CBZ 输出目录 (最终打包文件)
+      - ./cbz:/cbz
+    environment:
+      # --- 基础配置 ---
+      - CMNAS_LOG_LEVEL=INFO
+
+      # --- Copymanga 账号配置 (必填) ---
+      # 如果你的 config.py 优先读取环境变量，填在这里
+      - CMNAS_CM_USERNAME=your_username
+      - CMNAS_CM_PASSWORD=your_password
+
+      # --- 代理配置 (可选但推荐) ---
+      # 注意：如果使用本机代理，在Docker中可能需要写 http://host.docker.internal:7890
+      - CMNAS_CM_PROXY=
+
+      # --- API URL ---
+      - CMNAS_API_URL=https://api.mangacopy.com
+
+      # --- 行为配置 ---
+      # 是否使用copymanga原名 (True/False)
+      - CMNAS_USE_CM_CNAME=False
