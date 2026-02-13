@@ -1,8 +1,12 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import vuetify from 'vite-plugin-vuetify'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    vuetify({ autoImport: true }), // 自动按需加载 Vuetify 组件
+  ],
   server: {
     proxy: {
       '/api': {
