@@ -16,6 +16,15 @@
         ></v-list-item>
 
         <v-list-item
+            :active="currentView === 'logs'"
+            prepend-icon="mdi-text-box-outline"
+            rounded="xl"
+            title="运行日志"
+            value="logs"
+            @click="currentView = 'logs'"
+        ></v-list-item>
+
+        <v-list-item
             :active="currentView === 'schedule'"
             prepend-icon="mdi-clock"
             rounded="xl"
@@ -159,7 +168,8 @@
                 </v-col>
 
                 <v-col v-if="!configData[siteKey]?.length" cols="12">
-                  <v-sheet border class="d-flex align-center justify-center py-12 bg-transparent border-dashed text-medium-emphasis"
+                  <v-sheet border
+                           class="d-flex align-center justify-center py-12 bg-transparent border-dashed text-medium-emphasis"
                            rounded="xl">
                     <div class="text-center">
                       <v-icon class="mb-3 opacity-50" size="48">mdi-inbox-outline</v-icon>
@@ -169,6 +179,35 @@
                 </v-col>
               </v-row>
             </div>
+          </div>
+
+          <div v-else-if="currentView === 'logs'" key="logs">
+            <v-card border class="fill-height rounded-xl d-flex flex-column" elevation="0" flat min-height="70vh">
+              <v-toolbar class="border-b px-2" color="surface" density="compact">
+                <v-icon class="ml-2" color="primary" start>mdi-text-box-outline</v-icon>
+                <v-toolbar-title class="text-body-2 font-weight-bold">系统实时日志</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-switch
+                    v-model="autoScroll"
+                    color="primary"
+                    label="自动滚动"
+                    hide-details
+                    density="compact"
+                    class="mr-4"
+                ></v-switch>
+                <v-btn :loading="loadingLogs" color="primary" prepend-icon="mdi-refresh" variant="text"
+                       @click="fetchLogs(false)">刷新日志
+                </v-btn>
+              </v-toolbar>
+              <div
+                  ref="logContainer"
+                  class="flex-grow-1 bg-grey-darken-4 pa-4 font-monospace overflow-y-auto"
+                  style="max-height: 75vh; white-space: pre-wrap; font-size: 13px; line-height: 1.4;"
+              >
+                <div v-if="logs.length === 0" class="text-grey text-center mt-10">暂无日志或未获取</div>
+                <div v-for="(line, i) in logs" :key="i" class="log-line">{{ line }}</div>
+              </div>
+            </v-card>
           </div>
 
           <div v-else-if="currentView === 'schedule'" key="schedule" class="d-flex justify-center">
@@ -369,7 +408,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref} from 'vue'
+import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue'
 import axios from 'axios'
 import CronGenerator from './components/CronGenerator.vue'
 
@@ -384,6 +423,13 @@ const jsonStr = ref('{}')
 const cronExpression = ref('* * * * * *')
 const snackbar = ref({show: false, text: '', color: 'success'})
 
+// 日志相关
+const logs = ref([])
+const loadingLogs = ref(false)
+const logContainer = ref(null)
+const autoScroll = ref(true)
+let pollingTimer = null
+
 const dialog = ref({
   show: false,
   isEdit: false,
@@ -397,10 +443,54 @@ const pageTitle = computed(() => {
     dashboard: '我的订阅',
     schedule: '定时任务策略',
     json: '高级配置编辑器',
-    settings: '系统参数配置'
+    settings: '系统参数配置',
+    logs: '运行日志监控'
   }
   return map[currentView.value]
 })
+
+watch(currentView, (newVal) => {
+  if (newVal === 'logs') {
+    fetchLogs(false)
+    startLogPolling()
+  } else {
+    stopLogPolling()
+  }
+})
+
+const startLogPolling = () => {
+  stopLogPolling()
+  pollingTimer = setInterval(() => {
+    fetchLogs(true)
+  }, 2000)
+}
+
+const stopLogPolling = () => {
+  if (pollingTimer) {
+    clearInterval(pollingTimer)
+    pollingTimer = null
+  }
+}
+
+const fetchLogs = async (isBackground = false) => {
+  if (!isBackground) loadingLogs.value = true
+  try {
+    const res = await axios.get('/api/logs')
+    logs.value = res.data
+
+    if (autoScroll.value) {
+      await nextTick(() => {
+        if (logContainer.value) {
+          logContainer.value.scrollTop = logContainer.value.scrollHeight
+        }
+      })
+    }
+  } catch (e) {
+    if (!isBackground) showMsg('获取日志失败', 'error')
+  } finally {
+    if (!isBackground) loadingLogs.value = false
+  }
+}
 
 const init = async () => {
   try {
@@ -422,7 +512,6 @@ const init = async () => {
 
     if (schedRes.data && schedRes.data.cron) {
       cronExpression.value = schedRes.data.cron
-      console.log('Cron 已加载:', schedRes.data.cron)
     } else {
       cronExpression.value = '0 30 2 * * *'
     }
@@ -441,6 +530,10 @@ const manualRun = async () => {
   try {
     await axios.post('/api/run')
     showMsg('后台任务已启动')
+    // 如果当前在日志页，稍微延迟后刷新一下
+    if (currentView.value === 'logs') {
+      setTimeout(() => fetchLogs(true), 1000)
+    }
   } catch (e) {
     showMsg('启动失败', 'error')
   } finally {
@@ -488,8 +581,7 @@ const saveToServer = async () => {
 
 const saveJson = async () => {
   try {
-    const data = JSON.parse(jsonStr.value)
-    configData.value = data
+    configData.value = JSON.parse(jsonStr.value)
     await saveToServer()
   } catch (e) {
     showMsg('JSON 格式错误', 'error')
@@ -518,6 +610,9 @@ const saveSystemSettings = async () => {
 }
 
 onMounted(init)
+onUnmounted(() => {
+  stopLogPolling()
+})
 </script>
 
 <style scoped>

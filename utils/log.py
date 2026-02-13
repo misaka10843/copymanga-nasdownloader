@@ -40,7 +40,7 @@ def configure_logging():
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     rich_formatter = logging.Formatter(
-        fmt='%(message)s',
+        fmt='[%(name)s] %(message)s',
         datefmt="[%X]"
     )
 

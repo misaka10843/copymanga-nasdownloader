@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from datetime import datetime
 from typing import Dict, Any
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -200,12 +201,13 @@ def get_logs():
     files = sorted([f for f in os.listdir(log_dir) if f.endswith('.log')])
     if not files: return []
     latest = files[-1]
-    with open(os.path.join(log_dir, latest), 'r', encoding='utf-8') as f:
-        # 只返回最后 100 行
-        return f.readlines()[-100:]
+    try:
+        with open(os.path.join(log_dir, latest), 'r', encoding='utf-8') as f:
+            return f.readlines()[-200:]
+    except Exception as e:
+        log.error(f"读取日志文件失败: {e}")
+        return [f"读取日志出错: {str(e)}"]
 
 
 if os.path.exists("spa_dist"):
     app.mount("/", StaticFiles(directory="spa_dist", html=True), name="static")
-
-from datetime import datetime
