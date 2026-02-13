@@ -18,7 +18,7 @@
                 control-variant="split"
                 density="compact"
                 hide-details
-                style="width: 90px"
+                style="width: 150px"
                 variant="outlined"
                 @focus="type = 'interval'"
             ></v-number-input>
@@ -29,7 +29,7 @@
                 control-variant="split"
                 density="compact"
                 hide-details
-                style="width: 90px"
+                style="width: 150px"
                 variant="outlined"
                 @focus="type = 'interval'"
             ></v-number-input>
@@ -47,7 +47,7 @@
                 :max="max" :min="min"
                 density="compact"
                 hide-details
-                style="width: 80px"
+                style="width: 150px"
                 variant="outlined"
                 @focus="type = 'range'"
             ></v-number-input>
@@ -57,7 +57,7 @@
                 :max="max" :min="min"
                 density="compact"
                 hide-details
-                style="width: 80px"
+                style="width: 150px"
                 variant="outlined"
                 @focus="type = 'range'"
             ></v-number-input>
