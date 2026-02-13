@@ -1,3 +1,10 @@
+FROM node:22-alpine as frontend-builder
+WORKDIR /app/frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm install
+COPY frontend/ .
+RUN npm run build
+
 FROM python:3.10-slim
 
 WORKDIR /app
@@ -5,14 +12,13 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
+RUN pip install --no-cache-dir fastapi uvicorn apscheduler
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# 创建必要的目录（用于挂载）
-RUN mkdir -p /data /downloads /cbz
+COPY --from=frontend-builder /app/frontend/dist /app/spa_dist
 
-ENV PYTHONUNBUFFERED=1
 ENV CMNAS_DATA_PATH=/data
 ENV CMNAS_DOWNLOAD_PATH=/downloads
 ENV CMNAS_CBZ_PATH=/cbz

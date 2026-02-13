@@ -11,6 +11,40 @@ class BaseUpdater:
     REQUIRED_FIELDS = ['last_download_date', 'latest_chapter']
 
     @classmethod
+    def get_field_meta(cls) -> Dict[str, Dict[str, str]]:
+        meta = {}
+        # 默认字段配置
+        defaults = {
+            'name': {'label': '漫画名称', 'type': 'text', 'placeholder': '请输入文件夹名称', 'cols': 6},
+            'comic_id': {'label': '漫画ID', 'type': 'text', 'placeholder': 'Site ID', 'cols': 6},
+            'path_word': {'label': '路径词 (path_word)', 'type': 'text', 'cols': 6},
+            'group_word': {'label': '汉化组/分类', 'type': 'text', 'default': 'default', 'cols': 6},
+            'latest_chapter': {'label': '最后章节', 'type': 'text', 'placeholder': '留空下载所有', 'advanced': True,
+                               'cols': 12},
+            'last_download_date': {'label': '更新时间', 'type': 'readonly', 'advanced': True, 'cols': 12},
+            'ep_pattern': {'label': '话数正则', 'type': 'text', 'advanced': True, 'cols': 6},
+            'vol_pattern': {'label': '卷数正则', 'type': 'text', 'advanced': True, 'cols': 6},
+        }
+
+        if cls.ID_FIELD:
+            if cls.ID_FIELD in defaults:
+                meta[cls.ID_FIELD] = defaults[cls.ID_FIELD].copy()
+            else:
+                meta[cls.ID_FIELD] = {'label': cls.ID_FIELD, 'type': 'text', 'cols': 6}
+            meta[cls.ID_FIELD]['required'] = True
+            meta[cls.ID_FIELD]['primary'] = True
+
+        for field in cls.REQUIRED_FIELDS:
+            if field == cls.ID_FIELD: continue  # 跳过已处理的
+
+            if field in defaults:
+                meta[field] = defaults[field]
+            else:
+                meta[field] = {'label': field, 'type': 'text', 'cols': 12}
+
+        return meta
+
+    @classmethod
     def validate_record(cls, record: Dict) -> bool:
         """验证记录是否符合站点要求"""
         if not cls.ID_FIELD:

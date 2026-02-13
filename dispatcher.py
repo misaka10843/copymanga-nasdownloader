@@ -1,5 +1,5 @@
-import logging
 import importlib
+import logging
 from typing import Dict, List, Any
 
 log = logging.getLogger(__name__)
@@ -8,8 +8,8 @@ log = logging.getLogger(__name__)
 class DownloadDispatcher:
     SITE_MODULES = {
         "copymanga": "plugins.copymanga.main",
-        "terra_historicus":"plugins.terra_historicus.main",
-        "antbyw":"plugins.antbyw.main",
+        "terra_historicus": "plugins.terra_historicus.main",
+        "antbyw": "plugins.antbyw.main",
     }
 
     @classmethod

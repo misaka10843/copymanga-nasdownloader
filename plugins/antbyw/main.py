@@ -1,9 +1,9 @@
+import json
 import logging
 import os
-import time
 import re
-import json
-from typing import List, Dict, Any, Tuple
+import time
+from typing import List, Dict, Any
 from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
