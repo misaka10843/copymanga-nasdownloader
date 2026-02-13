@@ -62,7 +62,7 @@ CMNAS_CM_PROXY= # copymanga 使用的代理
 如果您想直接从代码库中运行WebUI，请确保运行了`frontend`中的前端文件以及运行`python3 server.py`
 
 > Todo
-> 
+>
 > 编写docker部署
 
 在部署完成之后您可以打开url然后访问WebUI
@@ -84,7 +84,7 @@ CMNAS_CM_PROXY= # copymanga 使用的代理
 
 ```json
 {
-  "copymanga":[
+  "copymanga": [
     {
       "name": "漫画名称(指定保存的系列名/文件夹名)",
       "ep_pattern": "重命名的话数的正则提取，默认可以为空",
@@ -171,7 +171,8 @@ CMNAS_CM_PROXY= # copymanga 使用的代理
 
 #### antbyw
 
-对于漫画ID获取可以直接前往官网点击任何一个漫画例如 `https://www.antbyw.com/plugin.php?id=jameson_manhua&a=read&kuid=196880` 中的 `196880`（kuid的值）
+对于漫画ID获取可以直接前往官网点击任何一个漫画例如
+`https://www.antbyw.com/plugin.php?id=jameson_manhua&a=read&kuid=196880` 中的 `196880`（kuid的值）
 就是漫画ID
 
 配置结构如下
@@ -269,5 +270,6 @@ CMNAS_CM_PROXY= # copymanga 使用的代理
 
 1. **环境变量**: 如需特殊配置（如 Cookie/Token），在 `utils/config.py` 和 `.env.sample` 中添加。
 2. **映射注册**:
+
 * `updater/updater.py` -> `SITE_MAPPING`
 * `dispatcher.py` -> `SITE_MODULES`

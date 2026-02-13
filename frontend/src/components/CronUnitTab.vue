@@ -2,71 +2,71 @@
   <div class="cron-unit-tab pa-2">
     <v-radio-group v-model="type" hide-details>
 
-      <v-radio value="every" class="mb-2">
+      <v-radio class="mb-2" value="every">
         <template #label>
           <span class="text-body-2">每{{ label }} ( * )</span>
         </template>
       </v-radio>
 
-      <v-radio value="interval" class="mb-2">
+      <v-radio class="mb-2" value="interval">
         <template #label>
           <div class="d-flex align-center flex-wrap">
             <span class="text-body-2 mr-2">从第</span>
             <v-number-input
-              v-model="intervalStart"
-              :min="min" :max="max"
-              control-variant="split"
-              density="compact"
-              variant="outlined"
-              hide-details
-              style="width: 90px"
-              @focus="type = 'interval'"
+                v-model="intervalStart"
+                :max="max" :min="min"
+                control-variant="split"
+                density="compact"
+                hide-details
+                style="width: 90px"
+                variant="outlined"
+                @focus="type = 'interval'"
             ></v-number-input>
             <span class="text-body-2 mx-2">{{ label }}开始，每隔</span>
             <v-number-input
-              v-model="intervalStep"
-              :min="1" :max="max"
-              control-variant="split"
-              density="compact"
-              variant="outlined"
-              hide-details
-              style="width: 90px"
-              @focus="type = 'interval'"
+                v-model="intervalStep"
+                :max="max" :min="1"
+                control-variant="split"
+                density="compact"
+                hide-details
+                style="width: 90px"
+                variant="outlined"
+                @focus="type = 'interval'"
             ></v-number-input>
             <span class="text-body-2 ml-2">{{ label }}执行一次</span>
           </div>
         </template>
       </v-radio>
 
-      <v-radio value="range" class="mb-2">
+      <v-radio class="mb-2" value="range">
         <template #label>
           <div class="d-flex align-center flex-wrap">
             <span class="text-body-2 mr-2">周期从</span>
             <v-number-input
-              v-model="rangeStart"
-              :min="min" :max="max"
-              density="compact"
-              variant="outlined"
-              hide-details
-              style="width: 80px"
-              @focus="type = 'range'"
+                v-model="rangeStart"
+                :max="max" :min="min"
+                density="compact"
+                hide-details
+                style="width: 80px"
+                variant="outlined"
+                @focus="type = 'range'"
             ></v-number-input>
             <span class="text-body-2 mx-2">-</span>
             <v-number-input
-              v-model="rangeEnd"
-              :min="min" :max="max"
-              density="compact"
-              variant="outlined"
-              hide-details
-              style="width: 80px"
-              @focus="type = 'range'"
+                v-model="rangeEnd"
+                :max="max" :min="min"
+                density="compact"
+                hide-details
+                style="width: 80px"
+                variant="outlined"
+                @focus="type = 'range'"
             ></v-number-input>
             <span class="text-body-2 ml-2">{{ label }}</span>
           </div>
         </template>
       </v-radio>
 
-      <v-radio value="specific" class="mb-2">
+      <v-radio class="mb-2" value="specific">
         <template #label>
           <span class="text-body-2">指定具体{{ label }}</span>
         </template>
@@ -76,13 +76,13 @@
     <v-expand-transition>
       <div v-if="type === 'specific'" class="bg-surface-variant rounded-lg pa-3 ml-8">
         <v-row dense>
-          <v-col v-for="n in (max - min + 1)" :key="n" cols="auto" class="pa-0 ma-1">
+          <v-col v-for="n in (max - min + 1)" :key="n" class="pa-0 ma-1" cols="auto">
             <v-chip
-              :color="selected.includes(n + min - 1) ? 'primary' : undefined"
-              :variant="selected.includes(n + min - 1) ? 'flat' : 'outlined'"
-              size="small"
-              link
-              @click="toggleSpecific(n + min - 1)"
+                :color="selected.includes(n + min - 1) ? 'primary' : undefined"
+                :variant="selected.includes(n + min - 1) ? 'flat' : 'outlined'"
+                link
+                size="small"
+                @click="toggleSpecific(n + min - 1)"
             >
               {{ n + min - 1 }}
             </v-chip>
@@ -94,7 +94,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import {computed, ref, watch} from 'vue'
 
 const props = defineProps(['modelValue', 'label', 'min', 'max'])
 const emit = defineEmits(['update:modelValue'])
@@ -117,8 +117,8 @@ const result = computed(() => {
       return `${rangeStart.value}-${rangeEnd.value}`
     case 'specific':
       return selected.value.length > 0
-        ? selected.value.sort((a,b)=>a-b).join(',')
-        : '*'
+          ? selected.value.sort((a, b) => a - b).join(',')
+          : '*'
     default:
       return '*'
   }

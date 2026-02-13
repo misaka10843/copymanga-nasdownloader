@@ -2,7 +2,9 @@ import logging
 import re
 from typing import Dict, List, Any, Tuple
 from urllib.parse import parse_qs, urlparse
+
 from bs4 import BeautifulSoup, Tag
+
 from utils.request import RequestHandler
 from .base import BaseUpdater
 
