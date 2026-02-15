@@ -61,9 +61,51 @@ CMNAS_CM_PROXY= # copymanga 使用的代理
 
 如果您想直接从代码库中运行WebUI，请确保运行了`frontend`中的前端文件以及运行`python3 server.py`
 
-> Todo
->
-> 编写docker部署
+#### docker compose部署
+
+```yml
+version: '3.8'
+
+services:
+  cmnas:
+    image: ghcr.io/misaka10843/copymanga-nasdownloader:latest
+    # 如果是国内网络请注释上方的代码，然后将下方代码的#删除掉
+    #image: ghcr.nju.edu.cn/misaka10843/copymanga-nasdownloader:latest
+    container_name: cmnas
+    restart: unless-stopped
+    ports:
+      - "8000:8000"  # Web 访问端口
+    volumes:
+      # 映射数据目录 (配置文件、日志)
+      - ./data:/data
+      # 映射下载目录 (临时下载文件)
+      - ./downloads:/downloads
+      # 映射 CBZ 输出目录 (最终打包文件)
+      - ./cbz:/cbz
+    environment:
+      # --- 基础配置 ---
+      - CMNAS_LOG_LEVEL=INFO
+
+      # --- Copymanga 账号配置 ---
+      # 如果你的 config.py 优先读取环境变量，填在这里
+      - CMNAS_CM_USERNAME=your_username
+      - CMNAS_CM_PASSWORD=your_password
+
+      # --- 代理配置 ---
+      # 注意：如果使用本机代理，在Docker中可能需要写 http://host.docker.internal:7890
+      - CMNAS_CM_PROXY=
+
+      # --- API URL ---
+      - CMNAS_API_URL=https://api.mangacopy.com
+
+      # --- 行为配置 ---
+      # 是否使用copymanga原名 (True/False)
+      - CMNAS_USE_CM_CNAME=False
+```
+
+将上方的内容保存到`docker-compose.yml`中，然后运行`docker compose up -d`即可部署完成
+
+---
 
 在部署完成之后您可以打开url然后访问WebUI
 
