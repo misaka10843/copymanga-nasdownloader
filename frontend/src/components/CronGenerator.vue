@@ -2,10 +2,6 @@
   <v-card class="cron-generator" border flat elevation="0">
     <div class="d-flex flex-row">
       <v-tabs v-model="activeTab" direction="vertical" color="primary" class="rounded-l-xl bg-grey-lighten-4">
-        <v-tab value="second">
-          <v-icon start>mdi-timer-outline</v-icon>
-          秒
-        </v-tab>
         <v-tab value="minute">
           <v-icon start>mdi-clock-outline</v-icon>
           分
@@ -45,7 +41,7 @@
 
     <div class="bg-primary-lighten-5 pa-4 d-flex align-center justify-space-between">
       <div>
-        <div class="text-caption text-medium-emphasis">生成的 Cron 表达式</div>
+        <div class="text-caption text-medium-emphasis">生成的 Cron 表达式 (分 时 日 月 周)</div>
         <div class="text-h5 font-weight-black font-monospace text-primary">{{ cronExpression }}</div>
       </div>
       <div class="text-body-2 text-right text-grey-darken-2">
@@ -62,10 +58,9 @@ import CronUnitTab from './CronUnitTab.vue'
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue'])
 
-const activeTab = ref('second')
+const activeTab = ref('minute')
 
 const timeUnits = [
-  {value: 'second', label: '秒', min: 0, max: 59},
   {value: 'minute', label: '分', min: 0, max: 59},
   {value: 'hour', label: '时', min: 0, max: 23},
   {value: 'day', label: '日', min: 1, max: 31},
@@ -74,7 +69,6 @@ const timeUnits = [
 ]
 
 const cronValues = reactive({
-  second: '0',
   minute: '30',
   hour: '2',
   day: '*',
@@ -85,8 +79,13 @@ const cronValues = reactive({
 onMounted(() => {
   if (props.modelValue) {
     const parts = props.modelValue.trim().split(/\s+/)
-    if (parts.length >= 6) {
-      cronValues.second = parts[0]
+    if (parts.length === 5) {
+      cronValues.minute = parts[0]
+      cronValues.hour = parts[1]
+      cronValues.day = parts[2]
+      cronValues.month = parts[3]
+      cronValues.week = parts[4]
+    } else if (parts.length === 6) {
       cronValues.minute = parts[1]
       cronValues.hour = parts[2]
       cronValues.day = parts[3]
@@ -97,7 +96,7 @@ onMounted(() => {
 })
 
 const cronExpression = computed(() => {
-  return `${cronValues.second} ${cronValues.minute} ${cronValues.hour} ${cronValues.day} ${cronValues.month} ${cronValues.week}`
+  return `${cronValues.minute} ${cronValues.hour} ${cronValues.day} ${cronValues.month} ${cronValues.week}`
 })
 
 const humanReadable = computed(() => {
@@ -108,7 +107,6 @@ const humanReadable = computed(() => {
 
   if (cronValues.hour !== '*') text.push(`${cronValues.hour}点`)
   if (cronValues.minute !== '*') text.push(`${cronValues.minute}分`)
-  if (cronValues.second !== '*' && cronValues.second !== '0') text.push(`${cronValues.second}秒`)
 
   text.push("执行")
   return text.join(' ')
