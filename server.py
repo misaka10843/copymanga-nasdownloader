@@ -149,7 +149,13 @@ def get_system_settings():
         "api_url": config.CM_API_URL,
         "cm_username": config.CM_USERNAME,
         "cm_password": config.CM_PASSWORD,
-        "cm_proxy": config.CM_PROXY.get('http', '')
+        "cm_proxy": config.CM_PROXY.get('http', ''),
+        "push_enable": config.PUSH_ENABLE,
+        "push_server": config.PUSH_SERVER,
+        "push_user": config.PUSH_USER,
+        "push_token": config.PUSH_TOKEN,
+        "push_summary_only": config.PUSH_SUMMARY_ONLY,
+        "push_markdown": config.PUSH_MARKDOWN
     }
 
 

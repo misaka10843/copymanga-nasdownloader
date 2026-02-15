@@ -4,72 +4,75 @@ import os
 
 from dotenv import load_dotenv
 
-# 加载 .env 文件中的环境变量
 load_dotenv(verbose=True)
 
 log = logging.getLogger(__name__)
 
 DATA_PATH = os.getenv("CMNAS_DATA_PATH") or os.getcwd()
-SYSTEM_CONFIG_PATH = os.path.join(DATA_PATH, "system_config.json")
 
-DOWNLOAD_PATH = ""
-CBZ_PATH = ""
-USE_CM_CNAME = False
-LOG_LEVEL = "WARNING"
-CM_API_URL = ""
-CM_TOKEN = ""
+# 基础配置
+DOWNLOAD_PATH = os.path.join(DATA_PATH, "downloads")
+CBZ_PATH = os.path.join(DATA_PATH, "cbz")
+USE_CM_CNAME = True
+LOG_LEVEL = "INFO"
+
+# CopyManga配置
 CM_USERNAME = ""
 CM_PASSWORD = ""
+CM_API_URL = "https://api.mangacopy.com"
 CM_PROXY = {}
 
-
-def load_system_config():
-    """读取 system_config.json"""
-    if os.path.exists(SYSTEM_CONFIG_PATH):
-        try:
-            with open(SYSTEM_CONFIG_PATH, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except Exception as e:
-            log.error(f"读取系统配置失败: {e}")
-    return {}
+# Push配置
+PUSH_ENABLE = False
+PUSH_SERVER = ""
+PUSH_USER = ""
+PUSH_TOKEN = ""
+PUSH_SUMMARY_ONLY = True
+PUSH_MARKDOWN = True
 
 
 def reload():
-    """
-    重载配置
-    优先级：Web配置 > 环境变量 > 默认值
-    """
     global DOWNLOAD_PATH, CBZ_PATH, USE_CM_CNAME, LOG_LEVEL
-    global CM_API_URL, CM_TOKEN, CM_USERNAME, CM_PASSWORD, CM_PROXY
+    global CM_USERNAME, CM_PASSWORD, CM_API_URL, CM_PROXY
+    global PUSH_ENABLE, PUSH_SERVER, PUSH_USER, PUSH_TOKEN, PUSH_SUMMARY_ONLY, PUSH_MARKDOWN
 
-    json_conf = load_system_config()
+    sys_cfg_path = os.path.join(DATA_PATH, "system_config.json")
+    sys_settings = {}
+    if os.path.exists(sys_cfg_path):
+        try:
+            with open(sys_cfg_path, 'r', encoding='utf-8') as f:
+                sys_settings = json.load(f)
+        except:
+            pass
 
-    def get_conf(key, env_key, default):
-        if key in json_conf and json_conf[key] is not None:
-            if isinstance(default, bool):
-                return bool(json_conf[key])
-            return json_conf[key]
-        return os.getenv(env_key) or default
+    # 基础配置
+    DOWNLOAD_PATH = sys_settings.get('download_path') or os.getenv("CMNAS_DOWNLOAD_PATH") or os.path.join(DATA_PATH,
+                                                                                                          "downloads")
+    CBZ_PATH = sys_settings.get('cbz_path') or os.getenv("CMNAS_CBZ_PATH") or os.path.join(DATA_PATH, "cbz")
 
-    DOWNLOAD_PATH = get_conf("download_path", "CMNAS_DOWNLOAD_PATH", os.path.join(os.getcwd(), "downloads"))
-    CBZ_PATH = get_conf("cbz_path", "CMNAS_CBZ_PATH", os.path.join(os.getcwd(), "cbz"))
-
-    use_cm_cname_raw = get_conf("use_cm_cname", "CMNAS_USE_CM_CNAME", False)
-    if isinstance(use_cm_cname_raw, str):
-        USE_CM_CNAME = use_cm_cname_raw.lower() in ('true', '1', 'yes')
+    use_cname_raw = sys_settings.get('use_cm_cname')
+    if use_cname_raw is None:
+        USE_CM_CNAME = os.getenv("CMNAS_USE_CM_CNAME", 'true').lower() == 'true'
     else:
-        USE_CM_CNAME = bool(use_cm_cname_raw)
+        USE_CM_CNAME = bool(use_cname_raw)
 
-    LOG_LEVEL = get_conf("log_level", "CMNAS_LOG_LEVEL", 'WARNING')
+    LOG_LEVEL = sys_settings.get('log_level') or os.getenv("CMNAS_LOG_LEVEL") or "INFO"
 
-    # Copymanga配置
-    CM_API_URL = get_conf("api_url", "CMNAS_API_URL", 'https://api.mangacopy.com')
-    CM_TOKEN = get_conf("cm_token", "CMNAS_CM_TOKEN", '')
-    CM_USERNAME = get_conf("cm_username", "CMNAS_CM_USERNAME", '')
-    CM_PASSWORD = get_conf("cm_password", "CMNAS_CM_PASSWORD", '')
+    # CopyManga配置
+    CM_USERNAME = sys_settings.get('cm_username') or os.getenv("CM_USERNAME") or ""
+    CM_PASSWORD = sys_settings.get('cm_password') or os.getenv("CM_PASSWORD") or ""
+    CM_API_URL = sys_settings.get('api_url') or os.getenv("CM_API_URL") or "https://api.mangacopy.com"
 
-    proxy_str = get_conf("cm_proxy", "CMNAS_CM_PROXY", '')
+    proxy_str = sys_settings.get('cm_proxy') or os.getenv("CM_PROXY")
     CM_PROXY = {'http': proxy_str, 'https': proxy_str} if proxy_str else {}
+
+    # Push配置
+    PUSH_ENABLE = sys_settings.get('push_enable', os.getenv('PUSH_ENABLE', 'false').lower() == 'true')
+    PUSH_SERVER = sys_settings.get('push_server', os.getenv('PUSH_SERVER', ''))
+    PUSH_USER = sys_settings.get('push_user', os.getenv('PUSH_USER', ''))
+    PUSH_TOKEN = sys_settings.get('push_token', os.getenv('PUSH_TOKEN', ''))
+    PUSH_SUMMARY_ONLY = sys_settings.get('push_summary_only', os.getenv('PUSH_SUMMARY_ONLY', 'true').lower() == 'true')
+    PUSH_MARKDOWN = sys_settings.get('push_markdown', os.getenv('PUSH_MARKDOWN', 'true').lower() == 'true')
 
     log.info("配置已重新加载")
 
