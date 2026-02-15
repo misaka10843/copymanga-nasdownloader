@@ -76,22 +76,27 @@ const cronValues = reactive({
   week: '*'
 })
 
+const parseCron = (expression) => {
+  if (!expression) return
+
+  const parts = expression.trim().split(/\s+/)
+
+  if (parts.length === 5) {
+    cronValues.minute = parts[0]
+    cronValues.hour = parts[1]
+    cronValues.day = parts[2]
+    cronValues.month = parts[3]
+    cronValues.week = parts[4]
+  }
+}
+
 onMounted(() => {
-  if (props.modelValue) {
-    const parts = props.modelValue.trim().split(/\s+/)
-    if (parts.length === 5) {
-      cronValues.minute = parts[0]
-      cronValues.hour = parts[1]
-      cronValues.day = parts[2]
-      cronValues.month = parts[3]
-      cronValues.week = parts[4]
-    } else if (parts.length === 6) {
-      cronValues.minute = parts[1]
-      cronValues.hour = parts[2]
-      cronValues.day = parts[3]
-      cronValues.month = parts[4]
-      cronValues.week = parts[5]
-    }
+  parseCron(props.modelValue)
+})
+
+watch(() => props.modelValue, (newVal) => {
+  if (newVal && newVal !== cronExpression.value) {
+    parseCron(newVal)
   }
 })
 
