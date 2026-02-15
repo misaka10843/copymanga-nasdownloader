@@ -10,17 +10,15 @@
 
 ## 前言💭
 
-此仓库是[copymanga-downloader](https://github.com/misaka10843/copymanga-downloader)的重构版本，专门为Nas系统进行设计
+此仓库原先是[copymanga-downloader](https://github.com/misaka10843/copymanga-downloader)的重构版本，但是随着功能的更新已经逐渐与原先的仓库开发方向分道扬镳
 
-请注意，因为是为Nas设计的所以可能会优化很多功能
-
-如果是桌面使用建议使用copymanga-downloader而不是nasdownlaoder
-
-建议使用青龙面板等来自定义触发时间与管理
+之后会着重与多漫画源+自动化下载，当前WebUI已可以正常使用，并可以设定cron定时任务等功能
 
 **非常非常非常不建议您每次运行时间间隔小于5天！！！！**
 
 您需要注意的一点，为了尽可能不影响到相关站点，此程序并不会也永不会支持多线程处理，请多多支持对应站点，小站真的不容易
+
+当前通知功能是按照[message-pusher](https://github.com/songquanpeng/message-pusher)的规范进行适配，可能并不会适配其他主流平台，请注意
 
 ## 当前支持站点
 

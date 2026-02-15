@@ -9,4 +9,3 @@ beautifulsoup4
 fastapi
 uvicorn
 apscheduler
-jinja2

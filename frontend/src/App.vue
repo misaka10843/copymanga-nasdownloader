@@ -13,8 +13,8 @@
         <v-list-item
             class="mb-4"
             prepend-icon="mdi-download-box"
-            subtitle="v2.0"
-            title="Copymanga"
+            subtitle="v2.1"
+            title="Copymanga-NasDownloader"
         ></v-list-item>
         <v-divider class="mb-2 opacity-20"></v-divider>
 
