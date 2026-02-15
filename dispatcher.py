@@ -10,6 +10,7 @@ class DownloadDispatcher:
         "copymanga": "plugins.copymanga.main",
         "terra_historicus": "plugins.terra_historicus.main",
         "antbyw": "plugins.antbyw.main",
+        "ganganonline": "plugins.ganganonline.main",
     }
 
     @classmethod
