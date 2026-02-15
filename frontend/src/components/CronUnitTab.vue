@@ -78,7 +78,7 @@
         <v-row dense>
           <v-col v-for="n in (max - min + 1)" :key="n" class="pa-0 ma-1" cols="auto">
             <v-chip
-                :color="selected.includes(n + min - 1) ? 'primary' : undefined"
+                :color="selected.includes(n + min - 1) ? 'primary' : 'secondary'"
                 :variant="selected.includes(n + min - 1) ? 'flat' : 'outlined'"
                 link
                 size="small"
