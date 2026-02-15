@@ -6,15 +6,18 @@
       <v-spacer></v-spacer>
       <v-switch
           v-model="autoScroll"
-          color="primary"
-          label="自动滚动"
-          hide-details
-          density="compact"
           class="mr-4"
+          color="primary"
+          density="compact"
+          hide-details
+          label="自动滚动"
       ></v-switch>
-      <v-btn :loading="loadingLogs" color="primary" prepend-icon="mdi-refresh" variant="text" @click="fetchLogs(false)">刷新日志</v-btn>
+      <v-btn :loading="loadingLogs" color="primary" prepend-icon="mdi-refresh" variant="text" @click="fetchLogs(false)">
+        刷新日志
+      </v-btn>
     </v-toolbar>
-    <div ref="logContainer" class="flex-grow-1 bg-grey-darken-4 pa-4 font-monospace overflow-y-auto" style="max-height: 75vh; white-space: pre-wrap; font-size: 13px; line-height: 1.4;">
+    <div ref="logContainer" class="flex-grow-1 bg-grey-darken-4 pa-4 font-monospace overflow-y-auto"
+         style="max-height: 75vh; white-space: pre-wrap; font-size: 13px; line-height: 1.4;">
       <div v-if="logs.length === 0" class="text-grey text-center mt-10">暂无日志或未获取</div>
       <div v-for="(line, i) in logs" :key="i" class="log-line">{{ line }}</div>
     </div>
@@ -22,7 +25,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, inject } from 'vue'
+import {inject, nextTick, onMounted, onUnmounted, ref} from 'vue'
 import axios from 'axios'
 
 const showMsg = inject('showMsg')
@@ -65,5 +68,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.font-monospace { font-family: 'Roboto Mono', monospace; }
+.font-monospace {
+  font-family: 'Roboto Mono', monospace;
+}
 </style>

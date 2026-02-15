@@ -6,15 +6,15 @@
         :permanent="!$vuetify.display.mobile"
         :rail="!$vuetify.display.mobile && rail"
         :temporary="$vuetify.display.mobile"
-        expand-on-hover
         color="primary"
+        expand-on-hover
     >
       <v-list density="compact" nav>
         <v-list-item
-            prepend-icon="mdi-download-box"
-            title="Copymanga"
-            subtitle="v2.0"
             class="mb-4"
+            prepend-icon="mdi-download-box"
+            subtitle="v2.0"
+            title="Copymanga"
         ></v-list-item>
         <v-divider class="mb-2 opacity-20"></v-divider>
 
@@ -68,15 +68,15 @@
     <v-main>
       <v-container class="pa-4 pa-md-6" fluid style="max-width: 1600px;">
         <v-fade-transition mode="out-in">
-          <component :is="currentPageComponent" key="view" />
+          <component :is="currentPageComponent" key="view"/>
         </v-fade-transition>
       </v-container>
     </v-main>
 
     <v-dialog v-model="confirmState.show" max-width="400" persistent>
-      <v-card class="rounded-xl pa-4" elevation="0" border>
+      <v-card border class="rounded-xl pa-4" elevation="0">
         <div class="d-flex align-center mb-4">
-          <v-icon color="warning" icon="mdi-alert-circle-outline" size="large" class="mr-3"></v-icon>
+          <v-icon class="mr-3" color="warning" icon="mdi-alert-circle-outline" size="large"></v-icon>
           <span class="text-h6 font-weight-bold">{{ confirmState.title }}</span>
         </div>
         <div class="text-body-1 text-medium-emphasis mb-6 pl-1">
@@ -86,8 +86,8 @@
           <v-btn
               class="px-4"
               color="primary"
-              variant="text"
               rounded="pill"
+              variant="text"
               @click="handleConfirm(false)"
           >
             取消
@@ -95,8 +95,8 @@
           <v-btn
               class="px-4"
               color="error"
-              variant="flat"
               rounded="pill"
+              variant="flat"
               @click="handleConfirm(true)"
           >
             确定删除
@@ -122,9 +122,9 @@
 </template>
 
 <script setup>
-import { computed, ref, provide, reactive } from 'vue'
+import {computed, provide, reactive, ref} from 'vue'
 import axios from 'axios'
-import { useDisplay } from 'vuetify'
+import {useDisplay} from 'vuetify'
 
 import Dashboard from './pages/Dashboard.vue'
 import Logs from './pages/Logs.vue'
@@ -132,7 +132,7 @@ import Schedule from './pages/Schedule.vue'
 import Settings from './pages/Settings.vue'
 import JsonEditor from './pages/JsonEditor.vue'
 
-const { mobile } = useDisplay()
+const {mobile} = useDisplay()
 
 const drawer = ref(!mobile.value)
 const rail = ref(true)
@@ -149,11 +149,11 @@ const confirmState = reactive({
 
 // 菜单配置
 const menuItems = [
-  { title: '我的订阅', value: 'dashboard', icon: 'mdi-view-dashboard', component: Dashboard },
-  { title: '运行日志', value: 'logs', icon: 'mdi-text-box-outline', component: Logs },
-  { title: '定时任务', value: 'schedule', icon: 'mdi-clock', component: Schedule },
-  { title: '系统设置', value: 'settings', icon: 'mdi-cog', component: Settings },
-  { title: '高级编辑', value: 'json', icon: 'mdi-code-json', component: JsonEditor },
+  {title: '我的订阅', value: 'dashboard', icon: 'mdi-view-dashboard', component: Dashboard},
+  {title: '运行日志', value: 'logs', icon: 'mdi-text-box-outline', component: Logs},
+  {title: '定时任务', value: 'schedule', icon: 'mdi-clock', component: Schedule},
+  {title: '系统设置', value: 'settings', icon: 'mdi-cog', component: Settings},
+  {title: '高级编辑', value: 'json', icon: 'mdi-code-json', component: JsonEditor},
 ]
 
 const currentPageComponent = computed(() => {
@@ -203,5 +203,7 @@ const manualRun = async () => {
 </script>
 
 <style>
-html { overflow-y: auto; }
+html {
+  overflow-y: auto;
+}
 </style>

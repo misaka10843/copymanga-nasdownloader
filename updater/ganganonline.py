@@ -1,7 +1,9 @@
-import logging
 import json
+import logging
 from typing import Dict, List, Any, Tuple
+
 from bs4 import BeautifulSoup
+
 from utils.request import RequestHandler
 from .base import BaseUpdater
 

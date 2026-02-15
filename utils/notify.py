@@ -52,10 +52,18 @@ class NotificationManager:
                 res = requests.post(url, json=payload, timeout=15)
                 res.raise_for_status()
             except requests.exceptions.RequestException:
-                res = requests.post(url, json=payload, timeout=15)
+                try:
+                    res = requests.post(url, json=payload, timeout=15)
+                except:
+                    log.error("推送请求失败，无法连接服务器")
+                    return
 
-            data = res.json()
-            if not data.get("success"):
+            try:
+                data = res.json()
+            except:
+                data = {"success": True}
+
+            if isinstance(data, dict) and not data.get("success", True):
                 log.error(f"推送失败: {data.get('message')}")
             else:
                 log.info(f"消息推送成功: {title}")
@@ -82,6 +90,8 @@ class NotificationManager:
         msg = f"[{site_name}] {manga_name} - {chapter_name}"
         self.success.append(msg)
         self.has_events = True
+        log.info(f"通知中心: 下载完成 - {msg}")
+
         if not config.PUSH_SUMMARY_ONLY:
             self._send(
                 title="下载完成",

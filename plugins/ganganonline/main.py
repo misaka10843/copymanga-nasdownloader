@@ -1,13 +1,15 @@
+import json
 import logging
 import os
 import time
-import json
 from typing import List, Dict, Any
+
 from bs4 import BeautifulSoup
 
 from downloader import downloader, postprocess
 from updater import updater
 from utils import config
+from utils.notify import notifier
 from utils.request import RequestHandler
 
 log = logging.getLogger(__name__)
@@ -49,6 +51,7 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_title: str, chapte
 
     if not image_list:
         log.error(f"无法获取章节 {chapter_title} (ID: {uuid}) 的图片内容")
+        notifier.add_error("ganganonline", f"{task['name']} - {chapter_title}", "获取章节图片内容失败")
         return False
 
     log.info(f"已获取到 {task['name']} {chapter_title} 的内容(共{len(image_list)}页)，开始安排下载")
@@ -56,6 +59,7 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_title: str, chapte
     save_path = os.path.join(config.DOWNLOAD_PATH, task['name'], chapter_title)
     os.makedirs(save_path, exist_ok=True)
 
+    download_failed = False
     for index, url in enumerate(image_list):
         image_path = os.path.join(save_path, f"{index:04d}.jpg")
 
@@ -63,6 +67,10 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_title: str, chapte
             log.info(f"已下载 {task['name']} {chapter_title} {index:04d}.jpg")
         else:
             log.error(f"下载失败: {task['name']} {chapter_title} {index:04d}.jpg")
+            download_failed = True
+
+    if download_failed:
+        notifier.add_error("ganganonline", f"{task['name']} - {chapter_title}", "部分图片下载失败")
 
     log.info(f"{task['name']} {chapter_title} 下载完成，开始进行cbz打包")
 
@@ -79,6 +87,7 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_title: str, chapte
         task['site'], task['comic_id'], chapter_title
     )
 
+    notifier.add_success("ganganonline", task['name'], chapter_title)
     log.info(f"{task['name']} {chapter_title} cbz打包完成")
     return True
 
@@ -91,9 +100,13 @@ def download_task(task: Dict[str, Any]):
     log.info(f"开始处理 {task['name']} 的 {len(task['chapter_infos'])} 个章节")
 
     for index, (uuid, name) in enumerate(task['chapter_infos']):
-        success = download_chapter(task, uuid, name, index)
-        if not success:
-            log.error(f"章节下载失败: {task['name']} {name}, CID: {uuid}")
+        try:
+            success = download_chapter(task, uuid, name, index)
+            if not success:
+                log.error(f"章节下载失败: {task['name']} {name}, CID: {uuid}")
+        except Exception as e:
+            log.error(f"章节处理异常: {e}")
+            notifier.add_error("ganganonline", f"{task['name']} - {name}", str(e))
         time.sleep(3)
 
     log.info(f"{task['name']} 需要更新的下载已完成")

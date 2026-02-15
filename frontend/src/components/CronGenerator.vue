@@ -1,7 +1,7 @@
 <template>
-  <v-card class="cron-generator" border flat elevation="0">
+  <v-card border class="cron-generator" elevation="0" flat>
     <div class="d-flex flex-row">
-      <v-tabs v-model="activeTab" direction="vertical" color="primary" class="rounded-l-xl bg-grey-lighten-4">
+      <v-tabs v-model="activeTab" class="rounded-l-xl bg-grey-lighten-4" color="primary" direction="vertical">
         <v-tab value="minute">
           <v-icon start>mdi-clock-outline</v-icon>
           分
@@ -30,8 +30,8 @@
           <cron-unit-tab
               v-model="cronValues[unit.value]"
               :label="unit.label"
-              :min="unit.min"
               :max="unit.max"
+              :min="unit.min"
           />
         </v-window-item>
       </v-window>

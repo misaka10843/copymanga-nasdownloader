@@ -70,10 +70,10 @@
               <v-text-field
                   v-model="sysSettings.push_server"
                   density="comfortable"
+                  hint="Message Pusher 的部署地址"
                   label="服务器地址"
                   placeholder="http://..."
                   variant="outlined"
-                  hint="Message Pusher 的部署地址"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="4">
@@ -159,7 +159,7 @@
 </template>
 
 <script setup>
-import {ref, onMounted, inject} from 'vue'
+import {inject, onMounted, ref} from 'vue'
 import axios from 'axios'
 
 const showMsg = inject('showMsg')

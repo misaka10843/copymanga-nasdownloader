@@ -7,6 +7,7 @@ from downloader import downloader, postprocess
 from plugins.copymanga.headers import HEADERS
 from updater import updater
 from utils import config
+from utils.notify import notifier
 from utils.rename import rename_series
 from utils.request import RequestHandler
 
@@ -30,6 +31,7 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_name: str):
     chapter = get_chapter(task['path_word'], uuid)
     if not chapter:
         log.error(f"无法获取章节 {chapter_name} (UUID: {uuid}) 的内容")
+        notifier.add_error("copymanga", f"{task['name']} - {chapter_name}", "获取章节内容失败")
         return False
 
     current_name = chapter_name
@@ -39,6 +41,7 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_name: str):
     os.makedirs(save_path, exist_ok=True)
 
     # 下载所有图片
+    download_failed = False
     for index, url in enumerate(chapter['contents']):
         image_path = os.path.join(save_path, f"{chapter['words'][index]:04d}.jpg")
         full_url = url['url'].replace("c800x.jpg", "c1500x.jpg").replace("c800x.webp", "c1500x.webp")
@@ -47,6 +50,10 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_name: str):
             log.info(f"已下载 {task['name']} {current_name} {chapter['words'][index]:04d}.jpg")
         else:
             log.error(f"下载失败: {task['name']} {current_name} {chapter['words'][index]:04d}.jpg")
+            download_failed = True
+
+    if download_failed:
+        notifier.add_error("copymanga", f"{task['name']} - {current_name}", "部分图片下载失败")
 
     log.info(f"{task['name']} {current_name} 下载完成，开始进行cbz打包")
 
@@ -67,6 +74,7 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_name: str):
         task['site'], task['path_word'], current_name
     )
 
+    notifier.add_success("copymanga", task['name'], current_name)
     log.info(f"{task['name']} {current_name} cbz打包完成")
     return True
 
@@ -80,9 +88,13 @@ def download_task(task: Dict[str, Any]):
     log.info(f"开始处理 {task['name']} 的 {len(task['chapter_infos'])} 个章节")
 
     for uuid, name in task['chapter_infos']:
-        success = download_chapter(task, uuid, name)
-        if not success:
-            log.error(f"章节下载失败: {task['name']} {name}, UUID: {uuid}")
+        try:
+            success = download_chapter(task, uuid, name)
+            if not success:
+                log.error(f"章节下载失败: {task['name']} {name}, UUID: {uuid}")
+        except Exception as e:
+            log.error(f"章节处理异常: {e}")
+            notifier.add_error("copymanga", f"{task['name']} - {name}", str(e))
         time.sleep(3)
 
     log.info(f"{task['name']} 需要更新的下载已完成")

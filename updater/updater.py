@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import Dict, List, Any
 
 from utils import config
-from . import copymanga, terra_historicus, antbyw
-from .ganganonline import GanganOnlineUpdater
+from utils.notify import notifier
+from . import copymanga, terra_historicus, antbyw, ganganonline
 
 log = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ SITE_MAPPING = {
     "copymanga": copymanga.CopyMangaUpdater,
     "terra_historicus": terra_historicus.TerraHistoricusUpdater,
     "antbyw": antbyw.AntbywUpdater,
-    "ganganonline": GanganOnlineUpdater
+    "ganganonline": ganganonline.GanganOnlineUpdater,
 }
 
 
@@ -61,10 +61,13 @@ def process_updates() -> List[Dict[str, Any]]:
                 uuids = site_instance.find_subsequent_uuids(chapters, record['latest_chapter'])
 
                 if uuids:
+                    notifier.add_update(site_name, record.get('name', '未知漫画'))
                     tasks.append(site_instance.create_download_task(record, uuids))
 
             except Exception as e:
-                log.error(f"处理站点 {site_name} 记录失败: {e}")
+                err_msg = f"处理站点 {site_name} 记录失败: {e}"
+                log.error(err_msg)
+                notifier.add_error(site_name, record.get('name', '更新检查'), str(e))
 
     return tasks
 

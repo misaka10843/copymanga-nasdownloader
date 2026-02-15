@@ -2,6 +2,8 @@ import importlib
 import logging
 from typing import Dict, List, Any
 
+from utils.notify import notifier
+
 log = logging.getLogger(__name__)
 
 
@@ -34,9 +36,15 @@ class DownloadDispatcher:
                     module.download_batch(tasks)
 
                     log.info(f"{site} 的所有任务处理完成")
-                except ImportError:
-                    log.error(f"找不到 {site} 站点的下载器")
+                except ImportError as e:
+                    err_msg = f"找不到 {site} 站点的下载器: {e}"
+                    log.error(err_msg)
+                    notifier.add_error(site, "调度器", err_msg)
                 except Exception as e:
-                    log.error(f"处理 {site} 下载任务时出错: {e}")
+                    err_msg = f"处理 {site} 下载任务时出错: {e}"
+                    log.error(err_msg)
+                    notifier.add_error(site, "调度器", str(e))
             else:
-                log.error(f"未知站点: {site}, 无法处理下载任务")
+                err_msg = f"未知站点: {site}, 无法处理下载任务"
+                log.error(err_msg)
+                notifier.add_error(site, "调度器", err_msg)

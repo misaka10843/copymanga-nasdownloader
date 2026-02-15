@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import {ref, onMounted, inject} from 'vue'
+import {inject, onMounted, ref} from 'vue'
 import axios from 'axios'
 import CronGenerator from '../components/CronGenerator.vue'
 

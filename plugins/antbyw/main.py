@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from downloader import downloader, postprocess
 from updater import updater
 from utils import config
+from utils.notify import notifier
 from utils.rename import rename_series
 from utils.request import RequestHandler
 
@@ -31,19 +32,15 @@ def get_headers(url):
 
 def extract_images_from_html(html_content: str) -> List[str]:
     """从 HTML 的 JS 脚本中提取 urls 数组"""
-    # 匹配模式: let urls = ["url1", "url2", ...];
     pattern = r'let\s+urls\s*=\s*(\[.*?\])\s*;'
     match = re.search(pattern, html_content, re.DOTALL)
 
     images = []
     if match:
         try:
-            # 尝试直接解析 JSON
             json_str = match.group(1)
             images = json.loads(json_str)
         except json.JSONDecodeError:
-            # 如果 JSON 解析失败（可能是单引号），使用正则粗暴提取链接
-            # 匹配引号内的内容，支持 http/https 开头
             link_pattern = r'["\'](http[^"\']+)["\']'
             images = re.findall(link_pattern, match.group(1))
 
@@ -52,10 +49,7 @@ def extract_images_from_html(html_content: str) -> List[str]:
 
 def get_total_pages(soup: BeautifulSoup) -> int:
     """从页面解析总页数"""
-    # 方式1: 查找 <span title="共 X 页">
-    # 注意：soup 可能会把 title 属性解析在父级或子级，需要灵活查找
     try:
-        # 查找包含 "共" 和 "页" 的 title 属性
         tag = soup.find(attrs={"title": re.compile(r"共\s*\d+\s*页")})
         if tag:
             title_text = tag.get("title")
@@ -63,19 +57,15 @@ def get_total_pages(soup: BeautifulSoup) -> int:
             if match:
                 return int(match.group(1))
 
-        # 方式2: 分析 .pg (pagination) 区域的链接
         pg_div = soup.find("div", class_="pg")
         if pg_div:
-            # 找到所有页码链接，取最大值
             links = pg_div.find_all("a")
             max_page = 1
             for link in links:
                 text = link.get_text(strip=True)
                 if text.isdigit():
                     max_page = max(max_page, int(text))
-                # 处理 "..." 或 "下一页" 这种非数字情况
                 elif "page=" in link.get("href", ""):
-                    # 尝试从 href 提取 page=X
                     href_match = re.search(r"page=(\d+)", link.get("href"))
                     if href_match:
                         max_page = max(max_page, int(href_match.group(1)))
@@ -88,10 +78,9 @@ def get_total_pages(soup: BeautifulSoup) -> int:
 
 
 def get_chapter_images(comic_id: str, zjid: str) -> tuple[str, List[str]]:
-    """获取完整章节的图片列表（包含翻页）"""
+    """获取完整章节的图片列表"""
     base_url = f"https://www.antbyw.com/plugin.php?id=jameson_manhua&a=read&kuid={comic_id}&zjid={zjid}"
 
-    # --- 获取第一页 ---
     log.info(f"正在分析第 1 页...")
     headers = get_headers(base_url)
     request.headers.update(headers)
@@ -109,7 +98,7 @@ def get_chapter_images(comic_id: str, zjid: str) -> tuple[str, List[str]]:
     if not images_p1:
         log.warning(f"第 1 页未找到图片，可能需要登录或页面结构变更。")
 
-    # --- 处理分页 ---
+    # 处理分页
     soup = BeautifulSoup(response.text, 'html.parser')
     total_pages = get_total_pages(soup)
 
@@ -154,6 +143,7 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_name: str):
     page_url, images = get_chapter_images(task['comic_id'], uuid)
     if not images:
         log.error(f"无法获取章节 {chapter_name} (ID: {uuid}) 的图片")
+        notifier.add_error("antbyw", f"{task['name']} - {chapter_name}", "获取章节图片失败")
         return False
 
     save_path = os.path.join(config.DOWNLOAD_PATH, task['name'], chapter_name)
@@ -194,6 +184,7 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_name: str):
 
     if success_count == 0:
         log.error(f"章节 {chapter_name} 下载失败，无图片成功下载")
+        notifier.add_error("antbyw", f"{task['name']} - {chapter_name}", "所有图片下载失败")
         return False
 
     # 重命名与打包
@@ -207,6 +198,9 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_name: str):
     )
 
     updater.update_chapter_record(task['site'], task['comic_id'], chapter_name)
+
+    notifier.add_success("antbyw", task['name'], chapter_name)
+
     return True
 
 
@@ -217,9 +211,13 @@ def download_task(task: Dict[str, Any]):
     log.info(f"开始处理 {task['name']} 的 {len(task['chapter_infos'])} 个章节")
 
     for uuid, name in task['chapter_infos']:
-        success = download_chapter(task, uuid, name)
-        if not success:
-            log.error(f"章节下载失败: {name}")
+        try:
+            success = download_chapter(task, uuid, name)
+            if not success:
+                log.error(f"章节下载失败: {name}")
+        except Exception as e:
+            log.error(f"章节处理异常: {e}")
+            notifier.add_error("antbyw", f"{task['name']} - {name}", str(e))
         time.sleep(2)
 
     log.info(f"{task['name']} 需要更新的下载已完成")

@@ -11,23 +11,23 @@
         </div>
         <v-spacer></v-spacer>
         <v-btn
+            class="hidden-xs"
             color="primary"
             prepend-icon="mdi-plus"
             rounded="pill"
             variant="tonal"
             @click="openAddDialog(siteKey)"
-            class="hidden-xs"
         >
           添加订阅
         </v-btn>
         <v-btn
+            class="hidden-sm-and-up"
             color="primary"
             icon="mdi-plus"
             rounded="circle"
+            size="small"
             variant="tonal"
             @click="openAddDialog(siteKey)"
-            class="hidden-sm-and-up"
-            size="small"
         ></v-btn>
       </div>
 
@@ -152,7 +152,7 @@
 </template>
 
 <script setup>
-import {onMounted, ref, inject} from 'vue'
+import {inject, onMounted, ref} from 'vue'
 import axios from 'axios'
 
 const showMsg = inject('showMsg')

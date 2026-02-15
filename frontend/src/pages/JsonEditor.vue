@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import {ref, onMounted, inject} from 'vue'
+import {inject, onMounted, ref} from 'vue'
 import axios from 'axios'
 
 const showMsg = inject('showMsg')

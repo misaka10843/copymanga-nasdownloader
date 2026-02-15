@@ -25,7 +25,7 @@ class CopyMangaUpdater(BaseUpdater):
             HEADERS['authorization'] = (f"Bearer "
                                         f"{loginhelper(username=config.CM_USERNAME, password=config.CM_PASSWORD, url=config.CM_API_URL)}")
             logging.debug(HEADERS)
-            
+
         log.info(f"获取漫画：{record['path_word']}，类别：{record['group_word']}")
         url = f"/api/v3/comic/{record['path_word']}/group/{record['group_word']}/chapters?limit=500&offset=0&platform=3&in_mainland=false"
         data = request.get(url)
