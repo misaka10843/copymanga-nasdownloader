@@ -120,9 +120,10 @@
                 <v-text-field
                     v-if="!meta.type || meta.type === 'text'"
                     v-model="dialog.data[fieldName]"
-                    :label="meta.label"
+                    :label="meta.advanced ? meta.label : `${meta.label} *`"
                     :placeholder="meta.placeholder"
                     :readonly="meta.type === 'readonly'"
+                    :rules="meta.advanced ? [] : [v => !!v || '此项必填']"
                     color="primary"
                     density="comfortable"
                     variant="outlined"
@@ -210,6 +211,15 @@ const removeItem = async (siteKey, idx) => {
 
 const saveDialog = () => {
   const {site, index, isEdit, data} = dialog.value
+  
+  const fields = schema.value[site].fields
+  for (const key in fields) {
+    if (!fields[key].advanced && !data[key]) {
+      showMsg('请填写必填项', 'error')
+      return
+    }
+  }
+
   if (isEdit) configData.value[site][index] = data
   else configData.value[site].push(data)
   dialog.value.show = false
