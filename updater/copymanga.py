@@ -19,14 +19,13 @@ class CopyMangaUpdater(BaseUpdater):
         'name', 'path_word', 'group_word', 'ep_pattern', 'vol_pattern'
     ]
 
-    def __init__(self):
+    def get_chapters(self, record: Dict) -> List[Dict]:
         if config.CM_USERNAME and config.CM_PASSWORD:
             logging.info("获取到copymanga用户名和密码，将尝试登录而不是使用配置的Token")
             HEADERS['authorization'] = (f"Bearer "
                                         f"{loginhelper(username=config.CM_USERNAME, password=config.CM_PASSWORD, url=config.CM_API_URL)}")
             logging.debug(HEADERS)
-
-    def get_chapters(self, record: Dict) -> List[Dict]:
+            
         log.info(f"获取漫画：{record['path_word']}，类别：{record['group_word']}")
         url = f"/api/v3/comic/{record['path_word']}/group/{record['group_word']}/chapters?limit=500&offset=0&platform=3&in_mainland=false"
         data = request.get(url)
