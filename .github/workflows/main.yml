@@ -58,7 +58,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
 
   build-binary:
     name: Build Single File (No Web)
@@ -96,8 +96,7 @@ jobs:
           nuitka-version: main
           script-name: main.py
           output-file: ${{ matrix.output_name }}
-          standalone: true
-          onefile: true
+          mode: onefile
           enable-plugins: upx
 
       - name: Upload Artifact
