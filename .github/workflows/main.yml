@@ -12,6 +12,16 @@ on:
         required: false
         type: boolean
         default: false
+      is_docker:
+        description: 'build docker?'
+        required: false
+        type: boolean
+        default: true
+      is_bin:
+        description: 'build bin file?'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -20,6 +30,7 @@ permissions:
 
 jobs:
   build-docker:
+    if: ${{ inputs.is_docker }}
     name: Build Docker Image
     runs-on: ubuntu-latest
     steps:
@@ -62,6 +73,7 @@ jobs:
 
   build-binary:
     name: Build Single File (No Web)
+    if: ${{ inputs.is_bin }}
     strategy:
       fail-fast: false
       matrix:
@@ -87,7 +99,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          # 确保安装 Nuitka 所需的 wheel
           pip install wheel zstandard
 
       - name: Build with Nuitka
@@ -97,7 +108,7 @@ jobs:
           script-name: main.py
           output-file: ${{ matrix.output_name }}
           mode: onefile
-          enable-plugins: upx
+          output-dir: build
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -109,6 +120,7 @@ jobs:
     name: Create Release
     needs: [ build-docker, build-binary ]
     runs-on: ubuntu-latest
+    if: ${{ inputs.is_bin }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

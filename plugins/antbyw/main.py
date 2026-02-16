@@ -20,7 +20,6 @@ request = RequestHandler()
 
 
 def get_headers(url):
-    """生成 Antbyw 需要的 Headers"""
     domain = f"{urlparse(url).scheme}://{urlparse(url).netloc}"
     return {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
@@ -31,7 +30,6 @@ def get_headers(url):
 
 
 def extract_images_from_html(html_content: str) -> List[str]:
-    """从 HTML 的 JS 脚本中提取 urls 数组"""
     pattern = r'let\s+urls\s*=\s*(\[.*?\])\s*;'
     match = re.search(pattern, html_content, re.DOTALL)
 
@@ -48,7 +46,6 @@ def extract_images_from_html(html_content: str) -> List[str]:
 
 
 def get_total_pages(soup: BeautifulSoup) -> int:
-    """从页面解析总页数"""
     try:
         tag = soup.find(attrs={"title": re.compile(r"共\s*\d+\s*页")})
         if tag:
@@ -78,7 +75,6 @@ def get_total_pages(soup: BeautifulSoup) -> int:
 
 
 def get_chapter_images(comic_id: str, zjid: str) -> tuple[str, List[str]]:
-    """获取完整章节的图片列表"""
     base_url = f"https://www.antbyw.com/plugin.php?id=jameson_manhua&a=read&kuid={comic_id}&zjid={zjid}"
 
     log.info(f"正在分析第 1 页...")
@@ -91,14 +87,12 @@ def get_chapter_images(comic_id: str, zjid: str) -> tuple[str, List[str]]:
 
     all_images = []
 
-    # 提取第一页图片
     images_p1 = extract_images_from_html(response.text)
     all_images.extend(images_p1)
 
     if not images_p1:
         log.warning(f"第 1 页未找到图片，可能需要登录或页面结构变更。")
 
-    # 处理分页
     soup = BeautifulSoup(response.text, 'html.parser')
     total_pages = get_total_pages(soup)
 
@@ -107,7 +101,6 @@ def get_chapter_images(comic_id: str, zjid: str) -> tuple[str, List[str]]:
 
         for page in range(2, total_pages + 1):
             page_url = f"{base_url}&page={page}"
-            # 适当延时
             time.sleep(0.5)
 
             resp = request.get(page_url)
@@ -121,7 +114,6 @@ def get_chapter_images(comic_id: str, zjid: str) -> tuple[str, List[str]]:
             else:
                 log.error(f"第 {page} 页请求失败")
 
-    # 去重（保持顺序）
     seen = set()
     unique_images = []
     for url in all_images:
@@ -129,7 +121,6 @@ def get_chapter_images(comic_id: str, zjid: str) -> tuple[str, List[str]]:
             unique_images.append(url)
             seen.add(url)
 
-    # 调试信息
     if not unique_images:
         log.error(f"章节解析失败，未找到任何图片。JS片段检查: {response.text[:1000] if response else 'No Response'}")
 
@@ -137,7 +128,6 @@ def get_chapter_images(comic_id: str, zjid: str) -> tuple[str, List[str]]:
 
 
 def download_chapter(task: Dict[str, Any], uuid: str, chapter_name: str):
-    """下载单个章节"""
     log.info(f"准备下载: {task['name']} - {chapter_name}")
 
     page_url, images = get_chapter_images(task['comic_id'], uuid)
@@ -149,7 +139,6 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_name: str):
     save_path = os.path.join(config.DOWNLOAD_PATH, task['name'], chapter_name)
     os.makedirs(save_path, exist_ok=True)
 
-    # --- Headers 注入逻辑 ---
     headers = get_headers(page_url)
     from downloader import request as dl_request
     old_headers = dl_request.headers.copy()
@@ -162,7 +151,6 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_name: str):
 
     for index, img_url in enumerate(images):
         file_extension = os.path.splitext(urlparse(img_url).path)[1]
-        # 处理 webp 后缀 (如 .jpg.webp -> .webp)
         if not file_extension or len(file_extension) > 5:
             if "webp" in img_url:
                 file_extension = ".webp"
@@ -174,7 +162,6 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_name: str):
 
         if downloader(img_url, save_file_path):
             success_count += 1
-            # 每下载5张打印一次进度，减少日志刷屏
             if index % 5 == 0 or index == total_images - 1:
                 log.info(f"进度: {index + 1}/{total_images}")
         else:
@@ -187,7 +174,6 @@ def download_chapter(task: Dict[str, Any], uuid: str, chapter_name: str):
         notifier.add_error("antbyw", f"{task['name']} - {chapter_name}", "所有图片下载失败")
         return False
 
-    # 重命名与打包
     chapter_filename, chapter_num, is_special = rename_series(
         chapter_name, task['ep_pattern'], task['vol_pattern']
     )
